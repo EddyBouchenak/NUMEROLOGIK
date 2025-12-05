@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>NUMEROLOGIK - Chemin de Vie & Compatibilité</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        /* BASE & TYPOGRAPHIE */
+        :root {
+            --color-bg: #111111;
+            --color-primary: #f0e68c; /* Or Clair */
+            --color-secondary: #a8dadc;
+            --color-text: #e0e0e0;
+            --color-subtext: #aaaaaa;
+            --color-border: #444444;
+        }
+
+        body {
+            margin: 0;
+            background: var(--color-bg);
+            color: var(--color-text);
+            font-family: 'Montserrat', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden;
+            user-select: none;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--color-primary);
+            text-align: center;
+            margin: 20px 0 30px;
+            letter-spacing: 1px;
+        }
+
+        h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 18px;
+            font-weight: 400;
+            color: var(--color-primary);
+            margin-top: 30px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        /* LAYOUT & CONTAINERS */
+        .container {
+            padding: 0 20px;
+            max-width: 600px;
+            margin: 0 auto;
+            flex-grow: 1;
+        }
+
+        /* INPUTS & BOUTONS */
+        .date-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"], input[type="number"], .input-single {
+            flex-grow: 1;
+            padding: 12px;
+            background: #1e1e24;
+            border: 1px solid var(--color-border);
+            color: var(--color-text);
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            box-sizing: border-box;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        input:focus, .input-single:focus-within {
+            border-color: var(--color-primary);
+            box-shadow: 0 0 8px rgba(240, 230, 140, 0.2);
+        }
+
+        .input-single {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .input-single input {
+            background: none;
+            border: none;
+            padding: 0;
+            width: 100%;
+            text-align: center;
+        }
+
+        .toggle-view {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 14px;
+            color: var(--color-subtext);
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .toggle-view:hover {
+            color: var(--color-primary);
+        }
+
+        .btn-reveal {
+            width: 100%;
+            padding: 15px;
+            background: var(--color-primary);
+            color: var(--color-bg);
+            border: none;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+            box-shadow: 0 5px 15px rgba(240, 230, 140, 0.2);
+        }
+
+        .btn-reveal:active {
+            transform: scale(0.98);
+            box-shadow: 0 2px 10px rgba(240, 230, 140, 0.4);
+        }
+
+        .error-message {
+            color: #ff6347; /* Rouge Tomate */
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+            display: none;
+        }
+
+        /* OVERLAY & RESULTS */
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: auto;
+            background: radial-gradient(circle at center, #232526 0%, #111111 100%);
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
+            padding: 20px 16px calc(20px + env(safe-area-inset-bottom));
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        #overlay.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .spinner-wrap { position: absolute; }
+
+        .spinner {
+            width: 80px; height: 80px; border-radius: 50%;
+            border: 2px solid var(--color-primary); opacity: 0;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse { 0% { transform: scale(0.5); opacity: 0; } 50% { opacity: 0.5; } 100% { transform: scale(1.5); opacity: 0; } }
+
+        .card-body {
+            text-align: center;
+            padding: 30px 20px;
+            width: 100%;
+            max-width: 450px;
+            display: none;
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+            transition: all 0.8s ease-out;
+            background: #202020;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-body.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .card-icon {
+            font-size: 60px;
+            margin-bottom: 5px;
+            color: var(--color-primary);
+            line-height: 1;
+            filter: drop-shadow(0 0 10px rgba(240, 230, 140, 0.3));
+        }
+
+        .display-date {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-subtext);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        
+        /* Titre CV principal */
+        .card-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--color-primary);
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .card-subtitle {
+            font-size: 14px;
+            color: var(--color-subtext);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .card-description {
+            font-size: 15px;
+            line-height: 1.6;
+            color: var(--color-text);
+            margin-bottom: 25px;
+        }
+
+        /* STYLE NOUVELLE GRILLE DE SYMBOLIQUES (TUILLES) */
+        .symbolics-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* 2 colonnes par défaut */
+            gap: 10px;
+            margin: 20px 0;
+            padding: 0 5px;
+        }
+        
+        .symbolic-tile {
+            background: #282828;
+            padding: 12px 5px;
+            border-radius: 6px;
+            border: 1px solid #333;
+            min-height: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .symbolic-tile.full-width {
+            grid-column: 1 / -1; /* Prend toute la largeur */
+        }
+
+        .tile-label {
+            font-size: 10px;
+            color: var(--color-subtext);
+            text-transform: uppercase;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            margin-bottom: 3px;
+        }
+        
+        .tile-value {
+            font-size: 14px;
+            color: var(--color-text);
+            font-weight: 700;
+        }
+        
+        .symbolic-tile.archetype {
+            background: #2f2f2f;
+            border-color: var(--color-secondary);
+            color: var(--color-secondary);
+        }
+        
+        .symbolic-tile.archetype .tile-value {
+            color: var(--color-secondary);
+        }
+
+        @media (max-width: 350px) {
+            .symbolics-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        @media (max-height: 700px) {
+            .card-body {
+                padding: 20px 16px;
+            }
+            .card-description {
+                font-size: 14px;
+            }
+        }
+        /* FIN STYLE NOUVELLE GRILLE */
+
+        .oracle-message {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 16px;
+            color: var(--color-primary);
+            margin-top: 20px;
+            padding: 15px 0;
+            border-top: 1px solid var(--color-border);
+            border-bottom: 1px solid var(--color-border);
+        }
+        
+        /* Bouton Comparer */
+        .btn-compare {
+            background: none;
+            border: 1px solid var(--color-secondary);
+            color: var(--color-secondary);
+            margin-top: 20px;
+        }
+        
+        .btn-compare:active {
+            background: var(--color-secondary);
+            color: var(--color-bg);
+            border-color: var(--color-secondary);
+        }
+
+        .action-btn {
+            margin-top: 15px;
+            padding: 10px 30px;
+            background: none;
+            border: 1px solid var(--color-subtext);
+            border-radius: 30px;
+            color: var(--color-subtext);
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+        }
+
+        .action-btn:active {
+            background: var(--color-primary);
+            color: var(--color-bg);
+            border-color: var(--color-primary);
+        }
+
+        /* COMPATIBILITY SECTION */
+        #compatibility-section {
+            padding: 20px;
+            background: #202020;
+            border-radius: 10px;
+            margin-top: 30px;
+            border: 1px solid var(--color-border);
+            transition: all 0.5s ease-out;
+        }
+
+        .compatibility-result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #282828; 
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .comp-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--color-secondary);
+            margin-bottom: 5px;
+        }
+
+        .comp-desc {
+            font-size: 14px;
+            color: var(--color-subtext);
+            line-height: 1.5;
+        }
+        
+        /* Détails Comp Card (pour la deuxième date) */
+        .details-comp-card {
+            background: #1a1a1a;
+            padding: 15px 15px 5px 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        /* NOUVEAU STYLE POUR L'ENTÊTE DANS LA CARTE DE COMPARAISON */
+        .comp-card-header h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--color-primary);
+            margin: 0;
+            letter-spacing: 0.5px;
+        }
+        .comp-card-header .display-date {
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+        /* FIN NOUVEAU STYLE */
+
+        .comp-label {
+            color: var(--color-subtext);
+            font-weight: 500;
+            font-size: 12px;
+            display: block;
+            margin-top: 10px;
+            border-top: 1px solid #333;
+            padding-top: 5px;
+        }
+        
+        .comp-value {
+            color: var(--color-text);
+            font-weight: 700;
+            font-size: 15px;
+            display: block;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        
+        /* FOOTER */
+        .footer {
+            margin-top: 40px;
+            padding: 20px 0;
+            text-align: center;
+            font-size: 11px;
+            color: #444;
+        }
+
+        /* UTILS */
+        .hidden { display: none !important; }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1 id="app-title">NUMEROLOGIK</h1>
+
+    <section id="main-form">
+        <h2>Votre Chemin de Vie</h2>
+        <div class="toggle-view" onclick="toggleInputMode()">
+            <span id="toggle-text">Passer à la saisie complète (JJ/MM/AAAA)</span>
+        </div>
+
+        <div id="input-mode-separate" class="date-input-group">
+            <input type="number" id="input-day" placeholder="Jour" min="1" max="31">
+            <input type="number" id="input-month" placeholder="Mois" min="1" max="12">
+            <input type="number" id="input-year" placeholder="Année" min="1900" max="2099">
+        </div>
+
+        <div id="input-mode-single" class="input-single hidden">
+             <input type="text" id="input-single" placeholder="JJ/MM/AAAA ou AAAA-MM-JJ" autocomplete="off">
+        </div>
+
+        <button class="btn-reveal" onclick="calculateLifePath()">Révéler mon Totem</button>
+        <div class="error-message" id="error-msg"></div>
+
+    </section>
+
+    <section id="compatibility-toggle" class="toggle-view" onclick="toggleCompatibility()">
+        <span>+ Ajouter une Compatibilité Numérologik</span>
+    </section>
+
+    <div id="compatibility-section" class="hidden">
+        <h2>Compatibilité</h2>
+         <div id="comp-input-mode-separate" class="date-input-group">
+            <input type="number" id="comp-input-day" placeholder="Jour 2" min="1" max="31">
+            <input type="number" id="comp-input-month" placeholder="Mois 2" min="1" max="12">
+            <input type="number" id="comp-input-year" placeholder="Année 2" min="1900" max="2099">
+        </div>
+        <button class="btn-reveal" onclick="calculateCompatibility()">Calculer la Relation</button>
+        <div class="error-message" id="comp-error-msg"></div>
+
+        <div id="compatibility-result" class="compatibility-result hidden">
+        </div>
+    </div>
+
+</div>
+
+<div id="overlay">
+    <div class="spinner-wrap" id="loading-state">
+        <div class="spinner"></div>
+    </div>
+    <div class="card-body" id="card-content">
+        <div class="card-icon" id="display-icon"></div>
+        <div class="display-date" id="display-date"></div> 
+        <div class="card-title" id="display-title"></div>
+        <div class="card-description" id="display-desc"></div>
+        
+        <div class="symbolics-container" id="display-symbolics"></div>
+        <div class="oracle-message" id="display-oracle"></div>
+        
+        <div class="action-btn btn-compare" onclick="showCompatibilitySection()">
+            Comparer une autre Date
+        </div>
+
+        <div class="action-btn" id="btn-back" onclick="dismissOverlay()">Retour</div>
+    </div>
+</div>
+
+<footer class="footer">
+    <p>&copy; 2025 NUMEROLOGIK. Calculs basés sur la numérologie classique et les nombres maîtres.</p>
+</footer>
+
+<script>
+    // --- CONFIGURATION ---
+    const ANALYTICS_ENDPOINT = "https://script.google.com/macros/s/AKfycby3MZlXYBgJsg08-qObUfRib7srhR7NDYZRRLfjySFI0whtPpNgTsgQjLB73OL1_WEQSQ/exec";
+    
+    let lastSelectedDate = null; 
+
+    const LIFE_PATH_DATA = {
+        1: { arch: "L'Initiateur", kw: "Indépendance", elem: "Feu", color: "Rouge", animal: "Aigle 🦅", desc: "Le numéro 1 est le chef, le pionnier. Vous êtes doté d'une forte volonté et d'un besoin d'autonomie. Votre défi est d'apprendre à diriger avec humilité.", oracle: ["Affirmez-vous avec audace, le monde attend votre lumière.", "Soyez le créateur de votre réalité, la graine est en vous.", "L'indépendance ne signifie pas la solitude, mais la maîtrise de soi."] },
+        2: { arch: "Le Partenaire", kw: "Coopération", elem: "Eau", color: "Orange", animal: "Dauphin 🐬", desc: "Le numéro 2 incarne la dualité et la diplomatie. Sensible et intuitif, vous excellez dans les relations. Votre force réside dans la patience et l'harmonie.", oracle: ["L'harmonie commence par l'écoute silencieuse de votre cœur.", "L'équilibre est trouvé dans la danse des opposés, soyez souple.", "Votre plus grande force réside dans votre douceur et votre capacité à unir."] },
+        3: { arch: "Le Créatif", kw: "Expression", elem: "Air", color: "Jaune", animal: "Papillon 🦋", desc: "Le numéro 3 est le communicateur joyeux et optimiste. Talentueux et sociable, vous inspirez les autres par votre légèreté. Cultivez votre discipline pour concrétiser vos idées.", oracle: ["Exprimez votre joie, elle est la mélodie de l'Univers.", "L'art et la communication sont vos outils, créez sans limite.", "Ne laissez pas la dispersion étouffer votre potentiel brillant."] },
+        4: { arch: "Le Bâtisseur", kw: "Structure", elem: "Terre", color: "Vert", animal: "Ours 🐻", desc: "Le numéro 4 est fondation, ordre et travail. Pratique et fiable, vous construisez durablement. Attention à ne pas vous enfermer dans la routine et la rigidité.", oracle: ["La patience est la clé de la construction durable, persévérez.", "Ancrez-vous dans le réel, votre travail portera ses fruits.", "La discipline est la rampe de lancement de votre succès."] },
+        5: { arch: "Le Voyageur", kw: "Liberté", elem: "Éther", color: "Bleu clair", animal: "Cheval 🐎", desc: "Le numéro 5 représente le changement, l'aventure et la curiosité. Adaptable et dynamique, vous avez besoin de liberté. Trouvez l'équilibre entre exploration et engagement.", oracle: ["Embrassez le changement, c'est le vent qui pousse les voiles de votre vie.", "La liberté se gagne par la responsabilité de vos choix.", "Le monde est votre terrain de jeu, explorez sans peur."] },
+        6: { arch: "Le Protecteur", kw: "Responsabilité", elem: "Eau", color: "Indigo", animal: "Chien 🐕", desc: "Le numéro 6 est amour, famille et service. Vous êtes le soignant, le conseiller dévoué. Apprenez à donner sans vous oublier ni surprotéger les autres.", oracle: ["L'amour véritable est inconditionnel, commencez par vous-même.", "Votre foyer est votre sanctuaire, nourrissez-le avec soin.", "Le service aux autres est votre vocation, trouvez l'équilibre."] },
+        7: { arch: "Le Chercheur", kw: "Analyse", elem: "Air", color: "Violet", animal: "Chouette 🦉", desc: "Le numéro 7 est introspection, spiritualité et analyse. Intuitif et perfectionniste, vous cherchez la vérité. Accordez du temps à la solitude pour écouter votre sagesse intérieure.", oracle: ["Le savoir intérieur est la vraie richesse, méditez et écoutez.", "Ne craignez pas la solitude, elle est le berceau de l'illumination.", "Analysez sans paralyser, la foi accompagne la raison."] },
+        8: { arch: "Le Manager", kw: "Pouvoir", elem: "Terre", color: "Rose/Or", animal: "Lion 🦁", desc: "Le numéro 8 est abondance, autorité et karma. Vous avez la capacité de gérer de grands projets et d'attirer le succès matériel. Utilisez votre pouvoir avec justice et intégrité.", oracle: ["Maîtrisez votre royaume, la prospérité est votre droit de naissance.", "L'équilibre entre le matériel et le spirituel est votre clé.", "Le Karma est une loi de cause et d'effet : semez l'excellence."] },
+        9: { arch: "L'Humaniste", kw: "Compassion", elem: "Feu", color: "Or/Blanc", animal: "Éléphant 🐘", desc: "Le numéro 9 est achèvement, altruisme et service universel. Généreux et tolérant, vous vivez pour le bien collectif. Lâchez l'attachement pour embrasser votre rôle de guide.", oracle: ["L'achèvement ouvre la voie à un nouveau cycle, préparez-vous.", "Votre compassion éclaire le chemin de l'humanité.", "Lâchez prise sur le passé, votre mission est plus grande que vous."] },
+        11: { arch: "L'Inspirateur", kw: "Illumination", elem: "Air/Feu", color: "Argent", animal: "Phénix 🔥", desc: "Nombre Maître. Intuition puissante, visionnaire et idéaliste. Vous êtes là pour inspirer le monde et éclairer les consciences. Gérez votre haute sensibilité pour ne pas sombrer dans l'anxiété.", oracle: ["Votre intuition est un pont vers l'Univers, faites-lui confiance.", "Le chemin de l'Inspirateur demande courage et authenticité.", "Transformez votre anxiété en force créatrice pour les autres."] },
+        22: { arch: "Le Maître Bâtisseur", kw: "Réalisation", elem: "Terre/Eau", color: "Cuivre", animal: "Dragon 🐉", desc: "Nombre Maître. Capacité à manifester les rêves à grande échelle. Vous possédez la vision du 11 et la méthode du 4. Utilisez cette force pour le bien de l'humanité.", oracle: ["Les plus grands rêves se bâtissent avec discipline et vision.", "Ne craignez pas l'ampleur de votre ambition, elle est juste.", "Votre héritage sera la preuve de votre maîtrise, agissez grand."] },
+        33: { arch: "Le Maître Enseignant", kw: "Dévotion", elem: "Amour", color: "Blanc pur", animal: "Licorne 🦄", desc: "Nombre Maître. Le plus rare. Il représente le service par l'Amour Inconditionnel, le guide spirituel. Vous êtes un guérisseur et un enseignant par l'exemple.", oracle: ["Le service rendu avec amour est la plus haute des vibrations.", "Vivez par l'exemple de l'amour inconditionnel et inspirez.", "Votre cœur est un phare, laissez sa lumière guider le monde."] }
+    };
+
+    const COMPATIBILITY_RULES = {
+        compatible: { title_fr: "Relation Compatible", desc_fr: "Vos chemins de vie s'harmonisent naturellement, partageant des valeurs et des rythmes similaires. Vous vous soutenez mutuellement dans vos quêtes respectives." },
+        complementary: { title_fr: "Relation Complémentaire", desc_fr: "Vos chemins sont différents, mais vos forces compensent les faiblesses de l'autre. C'est une relation d'apprentissage mutuel et d'enrichissement constant." },
+        opposite: { title_fr: "Relation Opposée (Challenge)", desc_fr: "Vos énergies sont souvent en tension, ce qui peut engendrer des défis, mais aussi une croissance rapide. Vous vous poussez hors de votre zone de confort." }
+    };
+
+    const COMPATIBILITY_MAP = {
+        1: { 1: 'C', 2: 'X', 3: 'C', 4: 'O', 5: 'C', 6: 'X', 7: 'O', 8: 'C', 9: 'X', 11: 'X', 22: 'C', 33: 'X' },
+        2: { 1: 'X', 2: 'C', 3: 'X', 4: 'C', 5: 'O', 6: 'C', 7: 'C', 8: 'O', 9: 'C', 11: 'C', 22: 'C', 33: 'C' },
+        3: { 1: 'C', 2: 'X', 3: 'C', 4: 'X', 5: 'C', 6: 'C', 7: 'X', 8: 'X', 9: 'C', 11: 'C', 22: 'X', 33: 'C' },
+        4: { 1: 'O', 2: 'C', 3: 'X', 4: 'C', 5: 'X', 6: 'C', 7: 'C', 8: 'X', 9: 'O', 11: 'X', 22: 'C', 33: 'C' },
+        5: { 1: 'C', 2: 'O', 3: 'C', 4: 'X', 5: 'C', 6: 'O', 7: 'X', 8: 'C', 9: 'X', 11: 'C', 22: 'X', 33: 'X' },
+        6: { 1: 'X', 2: 'C', 3: 'C', 4: 'C', 5: 'O', 6: 'C', 7: 'X', 8: 'X', 9: 'C', 11: 'C', 22: 'C', 33: 'C' },
+        7: { 1: 'O', 2: 'C', 3: 'X', 4: 'C', 5: 'X', 6: 'X', 7: 'C', 8: 'X', 9: 'C', 11: 'C', 22: 'X', 33: 'C' },
+        8: { 1: 'C', 2: 'O', 3: 'X', 4: 'X', 5: 'C', 6: 'X', 7: 'X', 8: 'C', 9: 'C', 11: 'X', 22: 'C', 33: 'X' },
+        9: { 1: 'X', 2: 'C', 3: 'C', 4: 'O', 5: 'X', 6: 'C', 7: 'C', 8: 'C', 9: 'C', 11: 'C', 22: 'C', 33: 'C' },
+        11: { 1: 'X', 2: 'C', 3: 'C', 4: 'X', 5: 'C', 6: 'C', 7: 'C', 8: 'X', 9: 'C', 11: 'C', 22: 'C', 33: 'C' },
+        22: { 1: 'C', 2: 'C', 3: 'X', 4: 'C', 5: 'X', 6: 'C', 7: 'X', 8: 'C', 9: 'C', 11: 'C', 22: 'C', 33: 'C' },
+        33: { 1: 'X', 2: 'C', 3: 'C', 4: 'C', 5: 'X', 6: 'C', 7: 'C', 8: 'X', 9: 'C', 11: 'C', 22: 'C', 33: 'C' }
+    };
+
+    // --- ÉLÉMENTS DU DOM ---
+    const overlay = document.getElementById('overlay');
+    const loadingState = document.getElementById('loading-state');
+    const cardContent = document.getElementById('card-content');
+    const errorMsg = document.getElementById('error-msg');
+    const compErrorMsg = document.getElementById('comp-error-msg');
+    const compSection = document.getElementById('compatibility-section');
+    const compResultDiv = document.getElementById('compatibility-result');
+
+    let isSingleInputMode = false;
+
+    // --- FONCTIONS UTILITAIRES ---
+    
+    function parseDate(dateString) {
+        const cleaned = dateString.trim();
+        let match = cleaned.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})$/);
+        if (match) {
+            return { year: parseInt(match[1]), month: parseInt(match[2]), day: parseInt(match[3]) };
+        }
+
+        match = cleaned.match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{2,4})$/);
+        if (match) {
+            const y = match[3].length === 2 ? (parseInt(match[3]) < 30 ? 2000 + parseInt(match[3]) : 1900 + parseInt(match[3])) : parseInt(match[3]);
+            return { day: parseInt(match[1]), month: parseInt(match[2]), year: y };
+        }
+
+        return null;
+    }
+
+    function validateDate(d, m, y) {
+        if (isNaN(d) || isNaN(m) || isNaN(y) || d < 1 || m < 1 || m > 12 || y < 1900 || y > 2099) {
+            return false;
+        }
+        const date = new Date(y, m - 1, d);
+        return date.getFullYear() === y && date.getMonth() === m - 1 && date.getDate() === d;
+    }
+
+    function reduceNumber(n) {
+        let sum = n;
+        while (sum > 9 && sum !== 11 && sum !== 22 && sum !== 33) {
+            sum = sum.toString().split('').reduce((acc, digit) => acc + parseInt(digit), 0);
+        }
+        return sum;
+    }
+
+    function calculateLifePathNumber(d, m, y) {
+        const d_r = reduceNumber(d);
+        const m_r = reduceNumber(m);
+        const y_r = reduceNumber(y);
+
+        let total = d_r + m_r + y_r;
+
+        if (total === 11 || total === 22 || total === 33) {
+            return total;
+        }
+
+        return reduceNumber(total);
+    }
+    
+    /**
+     * Formate la date en "25 JANVIER 1988"
+     */
+    function formatDateFr(d, m, y) {
+        try {
+            const date = new Date(y, m - 1, d);
+            const options = { day: 'numeric', month: 'long', year: 'numeric' };
+            let formatted = date.toLocaleDateString('fr-FR', options);
+            formatted = formatted.toUpperCase().replace(/\s+/g, ' '); 
+            if (formatted.startsWith('LE ')) {
+                formatted = formatted.substring(3);
+            }
+            return formatted;
+        } catch(e) {
+            return `${d}/${m}/${y}`;
+        }
+    }
+
+    function logAnalytics(payload) {
+        fetch(ANALYTICS_ENDPOINT, {
+            method: "POST",
+            body: JSON.stringify({ value: payload }), 
+            headers: {
+                'Content-Type': 'application/json', 
+            },
+            mode: 'no-cors' 
+        }).catch(e => console.error("Analytics Error:", e));
+    }
+    
+    function showCompatibilitySection() {
+        dismissOverlay(); 
+        toggleCompatibility(true); 
+        document.getElementById('compatibility-toggle').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // --- GESTION DE L'INTERFACE UTILISATEUR ---
+
+    function toggleInputMode() {
+        isSingleInputMode = !isSingleInputMode;
+        document.getElementById('input-mode-separate').classList.toggle('hidden', isSingleInputMode);
+        document.getElementById('input-mode-single').classList.toggle('hidden', !isSingleInputMode);
+        document.getElementById('toggle-text').innerText = isSingleInputMode
+            ? "Passer à la saisie séparée (Jour, Mois, Année)"
+            : "Passer à la saisie complète (JJ/MM/AAAA)";
+
+        document.getElementById('input-day').value = '';
+        document.getElementById('input-month').value = '';
+        document.getElementById('input-year').value = '';
+        document.getElementById('input-single').value = '';
+
+        errorMsg.style.display = 'none';
+    }
+
+    function showOverlay() {
+        overlay.classList.add('visible');
+        loadingState.style.display = 'block';
+        cardContent.classList.remove('show');
+        cardContent.style.display = 'none';
+
+        setTimeout(() => {
+            loadingState.style.display = 'none';
+            cardContent.style.display = 'block';
+            setTimeout(() => {
+                cardContent.classList.add('show');
+            }, 50);
+        }, 2000); 
+    }
+
+    function dismissOverlay() {
+        overlay.classList.remove('visible');
+    }
+    
+    function toggleCompatibility(forceShow = false) {
+        const compSectionEl = document.getElementById('compatibility-section');
+        const isCurrentlyHidden = compSectionEl.classList.contains('hidden');
+        
+        if (forceShow && !isCurrentlyHidden) return; 
+
+        if (forceShow) {
+            compSectionEl.classList.remove('hidden');
+        } else {
+            compSectionEl.classList.toggle('hidden');
+        }
+
+        const isVisible = !compSectionEl.classList.contains('hidden');
+        document.getElementById('compatibility-toggle').querySelector('span').innerText = isVisible
+            ? "- Masquer la Compatibilité Numérologik"
+            : "+ Ajouter une Compatibilité Numérologik";
+        
+        compErrorMsg.style.display = 'none';
+        compResultDiv.classList.add('hidden');
+    }
+
+    // --- LOGIQUE DE CALCUL PRINCIPALE ---
+
+    function getDateFromInputs() {
+        let day, month, year;
+
+        if (isSingleInputMode) {
+            const dateStr = document.getElementById('input-single').value;
+            const parsed = parseDate(dateStr);
+            if (parsed) {
+                day = parsed.day;
+                month = parsed.month;
+                year = parsed.year;
+            } else {
+                return null;
+            }
+        } else {
+            day = parseInt(document.getElementById('input-day').value);
+            month = parseInt(document.getElementById('input-month').value);
+            year = parseInt(document.getElementById('input-year').value);
+        }
+
+        if (validateDate(day, month, year)) {
+            return { day, month, year };
+        }
+        return null;
+    }
+
+    function calculateLifePath() {
+        errorMsg.style.display = 'none';
+        const dateObj = getDateFromInputs();
+
+        if (!dateObj) {
+            errorMsg.innerText = "Date de naissance invalide. Veuillez vérifier le format (JJ/MM/AAAA).";
+            errorMsg.style.display = 'block';
+            return;
+        }
+
+        lastSelectedDate = dateObj; 
+
+        const lpNumber = calculateLifePathNumber(dateObj.day, dateObj.month, dateObj.year);
+        const data = LIFE_PATH_DATA[lpNumber];
+
+        if (!data) {
+             errorMsg.innerText = "Erreur de calcul du Chemin de Vie. Réessayez.";
+             errorMsg.style.display = 'block';
+             return;
+        }
+
+        // --- AFFICHAGE DES RÉSULTATS ---
+        const oracleMessage = data.oracle[Math.floor(Math.random() * data.oracle.length)];
+        const formattedDate = formatDateFr(dateObj.day, dateObj.month, dateObj.year); 
+
+        document.getElementById('display-icon').innerText = data.animal.match(/[\uD800-\uDBFF][\uDC00-\uDFFF]|\uFE0F|[\u2600-\u26FF]|\u2700-\u27BF/g) ? data.animal.match(/[\uD800-\uDBFF][\uDC00-\uDFFF]|\uFE0F|[\u2600-\u26FF]|\u2700-\u27BF/g)[0] : '🔮';
+        document.getElementById('display-date').innerText = formattedDate; 
+        document.getElementById('display-title').innerText = `Chemin de Vie ${lpNumber}`;
+        document.getElementById('display-desc').innerText = data.desc;
+
+        // Code pour les tuiles de symboliques
+        const animalName = data.animal.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]|\uFE0F|[\u2600-\u26FF]|\u2700-\u27BF/g, '').trim();
+
+        const symbolicsHTML = `
+            <div class="symbolic-tile full-width archetype">
+                <span class="tile-label">ARCHÉTYPE</span>
+                <span class="tile-value">${data.arch}</span>
+            </div>
+            <div class="symbolic-tile">
+                <span class="tile-label">MOT-CLÉ</span>
+                <span class="tile-value">${data.kw}</span>
+            </div>
+            <div class="symbolic-tile">
+                <span class="tile-label">ÉLÉMENT</span>
+                <span class="tile-value">${data.elem}</span>
+            </div>
+            <div class="symbolic-tile">
+                <span class="tile-label">COULEUR</span>
+                <span class="tile-value">${data.color}</span>
+            </div>
+            <div class="symbolic-tile">
+                <span class="tile-label">ANIMAL</span>
+                <span class="tile-value">${animalName}</span>
+            </div>
+        `;
+        document.getElementById('display-symbolics').innerHTML = symbolicsHTML;
+        document.getElementById('display-oracle').innerText = oracleMessage;
+
+
+        // --- LOG ANALYTICS : CRÉATION DE L'OBJET DÉTAILLÉ ---
+        const logData = {
+            date: `${dateObj.day}/${dateObj.month}/${dateObj.year}`,
+            cv_number: lpNumber,
+            archetype: data.arch,
+            keyword: data.kw,
+            element: data.elem,
+            color: data.color,
+            animal: animalName
+        };
+        logAnalytics(logData);
+
+        showOverlay();
+    }
+
+
+    function calculateCompatibility() {
+        compErrorMsg.style.display = 'none';
+        compResultDiv.classList.add('hidden');
+
+        // Récupère la date 1
+        const d1 = parseInt(document.getElementById('input-day').value);
+        const m1 = parseInt(document.getElementById('input-month').value);
+        const y1 = parseInt(document.getElementById('input-year').value);
+        
+        let dateObj1 = null;
+        if (validateDate(d1, m1, y1)) {
+            dateObj1 = { day: d1, month: m1, year: y1 };
+        } else if (lastSelectedDate) {
+            dateObj1 = lastSelectedDate; // Utilise la dernière date calculée si les champs sont vides
+        }
+
+        if (!dateObj1) {
+            compErrorMsg.innerText = "Veuillez d'abord saisir une date de naissance valide pour la première personne.";
+            compErrorMsg.style.display = 'block';
+            return;
+        }
+        
+        const lp1 = calculateLifePathNumber(dateObj1.day, dateObj1.month, dateObj1.year);
+
+        // Récupère la date 2
+        const d2 = parseInt(document.getElementById('comp-input-day').value);
+        const m2 = parseInt(document.getElementById('comp-input-month').value);
+        const y2 = parseInt(document.getElementById('comp-input-year').value);
+
+        if (!validateDate(d2, m2, y2)) {
+            compErrorMsg.innerText = "Date de naissance 2 invalide. Veuillez vérifier le format (JJ/MM/AAAA).";
+            compErrorMsg.style.display = 'block';
+            return;
+        }
+        const lp2 = calculateLifePathNumber(d2, m2, y2);
+
+        // --- CALCUL DE COMPATIBILITÉ ---
+        const key1 = Math.min(lp1, lp2);
+        const key2 = Math.max(lp1, lp2);
+        
+        let type;
+        if (COMPATIBILITY_MAP[key1] && COMPATIBILITY_MAP[key1][key2]) {
+            type = COMPATIBILITY_MAP[key1][key2];
+        } else if (COMPATIBILITY_MAP[key2] && COMPATIBILITY_MAP[key2][key1]) {
+             type = COMPATIBILITY_MAP[key2][key1];
+        } else {
+            console.error("Erreur: Compatibilité non trouvée pour", key1, key2);
+            type = 'C';
+        }
+        
+        let relationType;
+        if (type === 'C') relationType = 'compatible';
+        else if (type === 'X') relationType = 'complementary';
+        else relationType = 'opposite';
+
+        const resultData = COMPATIBILITY_RULES[relationType];
+        
+        // Données complètes du CV 1 et CV 2
+        const data1 = LIFE_PATH_DATA[lp1];
+        const data2 = LIFE_PATH_DATA[lp2];
+        const formattedDate2 = formatDateFr(d2, m2, y2);
+        const animalName2 = data2.animal.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]|\uFE0F|[\u2600-\u26FF]|\u2700-\u27BF/g, '').trim();
+
+
+        // --- AFFICHAGE DE COMPATIBILITÉ ---
+        const details2HTML = `
+            <div class="details-comp-card">
+                <div class="comp-card-header">
+                    <h3 style="margin-top:0;">Chemin de Vie ${lp2}</h3>
+                    <div class="display-date">${formattedDate2}</div>
+                </div>
+                
+                <span class="comp-label">Archétype</span>
+                <span class="comp-value">${data2.arch}</span>
+                
+                <span class="comp-label">Mot-Clé</span>
+                <span class="comp-value">${data2.kw}</span>
+                
+                <span class="comp-label">Élément</span>
+                <span class="comp-value">${data2.elem}</span>
+                
+                <span class="comp-label">Animal</span>
+                <span class="comp-value">${animalName2}</span>
+            </div>
+        `;
+
+        compResultDiv.innerHTML = `
+            <div class="comp-title" id="comp-title">${resultData.title_fr}</div>
+            <div class="comp-desc" id="comp-desc">${resultData.desc_fr} (Chemins ${lp1} et ${lp2})</div>
+            ${details2HTML}
+        `;
+        compResultDiv.classList.remove('hidden');
+
+
+        // --- LOG ANALYTICS POUR LA COMPATIBILITÉ ---
+        const logData = {
+            date: `Comp. ${dateObj1.day}/${dateObj1.month}/${dateObj1.year} vs ${d2}/${m2}/${y2}`,
+            cv_number: `${lp1} vs ${lp2}`,
+            archetype: `Relation: ${resultData.title_fr}`,
+            keyword: relationType.toUpperCase(),
+            element: '-', color: '-', animal: '-'
+        };
+        logAnalytics(logData);
+    }
+
+    // --- INITIALISATION ---
+    document.addEventListener('DOMContentLoaded', () => {
+        const inputs = [
+            document.getElementById('input-day'),
+            document.getElementById('input-month'),
+            document.getElementById('input-year'),
+            document.getElementById('input-single')
+        ];
+        inputs.forEach(input => {
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    calculateLifePath();
+                }
+            });
+        });
+
+        const compInputs = [
+            document.getElementById('comp-input-day'),
+            document.getElementById('comp-input-month'),
+            document.getElementById('comp-input-year')
+        ];
+        compInputs.forEach(input => {
+             input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    calculateCompatibility();
+                }
+            });
+        });
+    });
+
+</script>
+</body>
+</html>
