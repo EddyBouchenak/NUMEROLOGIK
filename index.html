@@ -1,393 +1,172 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>NUMEROLOGIK - Chemin de Vie & Compatibilité</title>
-  <style>
-    /* BASE & TYPOGRAPHIE */
-    :root {
-        --color-bg: #111111;
-        --color-primary: #f0e68c; /* Or Clair */
-        --color-secondary: #a8dadc;
-        --color-text: #e0e0e0;
-        --color-subtext: #aaaaaa;
-        --color-border: #444444;
-    }
-    body {
-        margin: 0;
-        background: var(--color-bg);
-        color: var(--color-text);
-        font-family: 'Montserrat', sans-serif;
-        -webkit-tap-highlight-color: transparent;
-        /* ANCIEN: overflow-x: hidden; */
-        user-select: none;
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-    }
-    h1 {
-        font-family: 'Playfair Display', serif;
-        font-size: 24px;
-        font-weight: 700;
-        color: var(--color-primary);
-        text-align: center;
-        margin: 20px 0 30px;
-        letter-spacing: 1px;
-    }
-    h2 {
-        font-family: 'Playfair Display', serif;
-        font-size: 18px;
-        font-weight: 400;
-        color: var(--color-primary);
-        margin-top: 30px;
-        margin-bottom: 15px;
-        text-align: center;
-    }
-    /* LAYOUT & CONTAINERS */
-    .container {
-        padding: 0 20px;
-        max-width: 600px;
-        margin: 0 auto;
-        flex-grow: 1;
-    }
-    /* INPUTS & BOUTONS */
-    .date-input-group {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 20px;
-    }
-    input[type="text"], input[type="number"], .input-single {
-        flex-grow: 1;
-        padding: 12px;
-        background: #1e1e24;
-        border: 1px solid var(--color-border);
-        color: var(--color-text);
-        border-radius: 8px;
-        font-size: 16px;
-        outline: none;
-        box-sizing: border-box;
-        transition: all 0.3s;
-        text-align: center;
-    }
-    input:focus, .input-single:focus-within {
-        border-color: var(--color-primary);
-        box-shadow: 0 0 8px rgba(240, 230, 140, 0.2);
-    }
-    .input-single {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-family: 'Montserrat', sans-serif;
-    }
-    .input-single input {
-        background: none;
-        border: none;
-        padding: 0;
-        width: 100%;
-        text-align: center;
-    }
-    .toggle-view {
-        text-align: center;
-        margin-bottom: 25px;
-        font-size: 14px;
-        color: var(--color-subtext);
-        cursor: pointer;
-        transition: color 0.3s;
-    }
-    .toggle-view:hover {
-        color: var(--color-primary);
-    }
-    .btn-reveal {
-        width: 100%;
-        padding: 15px;
-        background: var(--color-primary);
-        color: var(--color-bg);
-        border: none;
-        border-radius: 30px;
-        font-size: 18px;
-        font-weight: 700;
-        cursor: pointer;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        transition: all 0.2s;
-        box-shadow: 0 5px 15px rgba(240, 230, 140, 0.2);
-    }
-    .btn-reveal:active {
-        transform: scale(0.98);
-        box-shadow: 0 2px 10px rgba(240, 230, 140, 0.4);
-    }
-    .error-message {
-        color: #ff6347; /* Rouge Tomate */
-        text-align: center;
-        margin-top: 15px;
-        font-size: 14px;
-        display: none;
-    }
-    /* OVERLAY & RESULTS (MODIFIÉ POUR UN SEUL BLOC) */
-    #overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        width: 100%;
-        /* CHANGEMENT CLÉ 1: Utiliser 100vh pour la hauteur */
-        height: 100vh; 
-        background: radial-gradient(circle at center, #232526 0%, #111111 100%);
-        z-index: 200;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.5s;
-        /* CHANGEMENT CLÉ 2: Réduire le padding horizontal pour éviter le dépassement */
-        padding: 20px 0; 
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-    #overlay.visible {
-        opacity: 1;
-        pointer-events: auto;
-    }
-    .spinner-wrap { position: absolute; }
-    .spinner {
-        width: 80px; height: 80px; border-radius: 50%;
-        border: 2px solid var(--color-primary); opacity: 0;
-        animation: pulse 1.5s infinite;
-    }
-    @keyframes pulse { 0% { transform: scale(0.5); opacity: 0; } 50% { opacity: 0.5; } 100% { transform: scale(1.5); opacity: 0; } }
-    .card-body {
-        text-align: center;
-        /* CHANGEMENT CLÉ 3: Assurer une largeur flexible avec une marge */
-        padding: 30px 20px;
-        width: 90%; /* Prend 90% de l'overlay */
-        max-width: 450px;
-        margin: auto; /* Pour centrer si besoin */
-        display: none;
-        opacity: 0;
-        transform: translateY(20px) scale(0.95);
-        transition: all 0.8s ease-out;
-        background: #202020;
-        border-radius: 15px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        box-sizing: border-box; /* S'assurer que padding et border sont inclus dans la largeur */
-    }
-    .card-body.show {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-    .card-icon {
-        font-size: 60px;
-        margin-bottom: 5px;
-        color: var(--color-primary);
-        line-height: 1;
-        filter: drop-shadow(0 0 10px rgba(240, 230, 140, 0.3));
-    }
-    .display-date {
-        font-size: 14px;
-        font-weight: 500;
-        color: var(--color-subtext);
-        margin-bottom: 20px;
-        text-transform: uppercase;
-    }                
-    /* Titre CV principal */
-    .card-title {
-        font-family: 'Playfair Display', serif;
-        font-size: 24px;
-        font-weight: 700;
-        color: var(--color-primary);
-        margin-bottom: 10px;
-        letter-spacing: 1px;
-    }
-    .card-subtitle {
-        font-size: 14px;
-        color: var(--color-subtext);
-        margin-bottom: 20px;
-        text-transform: uppercase;
-    }
-    .card-description {
-        font-size: 15px;
-        line-height: 1.6;
-        color: var(--color-text);
-        margin-bottom: 25px;
-    }
-    /* STYLE NOUVELLE GRILLE DE SYMBOLIQUES (TUILLES) */
-    .symbolics-container {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr); /* 2 colonnes par défaut */
-        gap: 10px;
-        margin: 20px 0;
-        padding: 0 5px;
-    }                
-    .symbolic-tile {
-        background: #282828;
-        padding: 12px 5px;
-        border-radius: 6px;
-        border: 1px solid #333;
-        min-height: 40px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-    }                
-    .symbolic-tile.full-width {
-        grid-column: 1 / -1; /* Prend toute la largeur */
-    }
-    .tile-label {
-        font-size: 10px;
-        color: var(--color-subtext);
-        text-transform: uppercase;
-        font-weight: 500;
-        letter-spacing: 0.5px;
-        margin-bottom: 3px;
-    }                
-    .tile-value {
-        font-size: 14px;
-        color: var(--color-text);
-        font-weight: 700;
-    }                
-    .symbolic-tile.archetype {
-        background: #2f2f2f;
-        border-color: var(--color-secondary);
-        color: var(--color-secondary);
-    }                
-    .symbolic-tile.archetype .tile-value {
-        color: var(--color-secondary);
-    }
-    @media (max-width: 350px) {
-        .symbolics-container {
-            grid-template-columns: 1fr;
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        /* BASE & TYPOGRAPHIE */
+        :root {
+            --color-bg: #111111;
+            --color-primary: #f0e68c; /* Or Clair */
+            --color-secondary: #a8dadc;
+            --color-text: #e0e0e0;
+            --color-subtext: #aaaaaa;
+            --color-border: #444444;
         }
-    }        
-    @media (max-height: 700px) {
-        .card-body {
-            padding: 20px 16px;
+
+        body {
+            margin: 0;
+            background: var(--color-bg);
+            color: var(--color-text);
+            font-family: 'Montserrat', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden;
+            user-select: none;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
-        .card-description {
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--color-primary);
+            text-align: center;
+            margin: 20px 0 30px;
+            letter-spacing: 1px;
+        }
+
+        h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 18px;
+            font-weight: 400;
+            color: var(--color-primary);
+            margin-top: 30px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        /* LAYOUT & CONTAINERS */
+        .container {
+            padding: 0 20px;
+            max-width: 600px;
+            margin: 0 auto;
+            flex-grow: 1;
+        }
+
+        /* INPUTS & BOUTONS */
+        .date-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"], input[type="number"], .input-single {
+            flex-grow: 1;
+            padding: 12px;
+            background: #1e1e24;
+            border: 1px solid var(--color-border);
+            color: var(--color-text);
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            box-sizing: border-box;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        input:focus, .input-single:focus-within {
+            border-color: var(--color-primary);
+            box-shadow: 0 0 8px rgba(240, 230, 140, 0.2);
+        }
+
+        .input-single {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .input-single input {
+            background: none;
+            border: none;
+            padding: 0;
+            width: 100%;
+            text-align: center;
+        }
+
+        .toggle-view {
+            text-align: center;
+            margin-bottom: 25px;
             font-size: 14px;
+            color: var(--color-subtext);
+            cursor: pointer;
+            transition: color 0.3s;
         }
-    }        
-    /* FIN STYLE NOUVELLE GRILLE */
-    .oracle-message {
-        font-family: 'Playfair Display', serif;
-        font-style: italic;
-        font-size: 16px;
-        color: var(--color-primary);
-        margin-top: 20px;
-        padding: 15px 0;
-        border-top: 1px solid var(--color-border);
-        border-bottom: 1px solid var(--color-border);
-    }                
-    /* Bouton Comparer */
-    .btn-compare {
-        background: none;
-        border: 1px solid var(--color-secondary);
-        color: var(--color-secondary);
-        margin-top: 20px;
-    }                
-    .btn-compare:active {
-        background: var(--color-secondary);
-        color: var(--color-bg);
-        border-color: var(--color-secondary);
-    }
-    .action-btn {
-        margin-top: 15px;
-        padding: 10px 30px;
-        background: none;
-        border: 1px solid var(--color-subtext);
-        border-radius: 30px;
-        color: var(--color-subtext);
-        cursor: pointer;
-        text-transform: uppercase;
-        font-size: 12px;
-        letter-spacing: 1px;
-        transition: all 0.3s;
-    }
-    .action-btn:active {
-        background: var(--color-primary);
-        color: var(--color-bg);
-        border-color: var(--color-primary);
-    }
-    /* COMPATIBILITY SECTION */
-    #compatibility-section {
-        padding: 20px;
-        background: #202020;
-        border-radius: 10px;
-        margin-top: 30px;
-        border: 1px solid var(--color-border);
-        transition: all 0.5s ease-out;
-    }
-    .compatibility-result {
-        margin-top: 20px;
-        padding: 15px;
-        background: #282828;
-         border-radius: 8px;
-        text-align: center;
-    }
-    .comp-title {
-        font-size: 18px;
-        font-weight: 700;
-        color: var(--color-secondary);
-        margin-bottom: 5px;
-    }
-    .comp-desc {
-        font-size: 14px;
-        color: var(--color-subtext);
-        line-height: 1.5;
-    }                
-    /* Détails Comp Card (pour la deuxième date) */
-    .details-comp-card {
-        background: #1a1a1a;
-        padding: 15px 15px 5px 15px;
-        border-radius: 8px;
-        margin-top: 20px;
-        text-align: center;
-    }                
-    /* NOUVEAU STYLE POUR L'ENTÊTE DANS LA CARTE DE COMPARAISON */
-    .comp-card-header h3 {
-        font-family: 'Playfair Display', serif;
-        font-size: 20px;
-        font-weight: 700;
-        color: var(--color-primary);
-        margin: 0;
-        letter-spacing: 0.5px;
-    }        
-    .comp-card-header .display-date {
-        font-size: 13px;
-        margin-bottom: 10px;
-    }        
-    /* FIN NOUVEAU STYLE */
-    .comp-label {
-        color: var(--color-subtext);
-        font-weight: 500;
-        font-size: 12px;
-        display: block;
-        margin-top: 10px;
-        border-top: 1px solid #333;
-        padding-top: 5px;
-    }                
-    .comp-value {
-        color: var(--color-text);
-        font-weight: 700;
-        font-size: 15px;
-        display: block;
-        text-transform: uppercase;
-        margin-bottom: 5px;
-    }                
-    /* FOOTER */
-    .footer {
-        margin-top: 40px;
-        padding: 20px 0;
-        text-align: center;
-        font-size: 11px;
-        color: #444;
-    }
-    /* UTILS */
-    .hidden { display: none !important; }
-</style>
+
+        .toggle-view:hover {
+            color: var(--color-primary);
+        }
+
+        .btn-reveal {
+            width: 100%;
+            padding: 15px;
+            background: var(--color-primary);
+            color: var(--color-bg);
+            border: none;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+            box-shadow: 0 5px 15px rgba(240, 230, 140, 0.2);
+        }
+
+        .btn-reveal:active {
+            transform: scale(0.98);
+            box-shadow: 0 2px 10px rgba(240, 230, 140, 0.4);
+        }
+
+        .error-message {
+            color: #ff6347; /* Rouge Tomate */
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+            display: none;
+        }
+
+        /* OVERLAY & RESULTS */
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: auto;
+            background: radial-gradient(circle at center, #232526 0%, #111111 100%);
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
+            padding: 20px 16px calc(20px + env(safe-area-inset-bottom));
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        #overlay.visible {
+            opacity: 1;
+            pointer-events: auto;
         }
 
         .spinner-wrap { position: absolute; }
