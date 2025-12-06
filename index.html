@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -509,7 +508,7 @@
 
 <script>
     // --- CONFIGURATION ---
-    const ANALYTICS_ENDPOINT = "https://script.google.com/macros/s/AKfycby3MZlXYBgJsg08-qObUfRib7srhR7NDYZRRLfjySFI0whtPpNgTsgQjLB73OL1_WEQSQ/exec";
+    const ANALYTICS_ENDPOINT = "https://script.google.com/macros/s/AKfycbzDojKACEkPrHfoWX9VwisjPZYnt3dD1pjd5oFqfSRTgN48QMJoP5OgsA0f3D2uQz5zEw/exec";
     
     let lastSelectedDate = null; 
 
@@ -561,6 +560,12 @@
     let isSingleInputMode = false;
 
     // --- FONCTIONS UTILITAIRES ---
+    
+    // Fonction AJOUTÉE pour le Google Script (calcul du signe chinois)
+    function getChineseZodiac(year) {
+        const signs = ["Singe", "Coq", "Chien", "Cochon", "Rat", "Buffle", "Tigre", "Lapin", "Dragon", "Serpent", "Cheval", "Chèvre"];
+        return signs[year % 12];
+    }
     
     function parseDate(dateString) {
         const cleaned = dateString.trim();
@@ -627,6 +632,7 @@
     }
 
     function logAnalytics(payload) {
+        // Envoi sous forme de STRING pour corriger l'erreur "match is not a function" dans le Google Script
         fetch(ANALYTICS_ENDPOINT, {
             method: "POST",
             body: JSON.stringify({ value: payload }), 
@@ -787,17 +793,15 @@
         document.getElementById('display-oracle').innerText = oracleMessage;
 
 
-        // --- LOG ANALYTICS : CRÉATION DE L'OBJET DÉTAILLÉ ---
-        const logData = {
-            date: `${dateObj.day}/${dateObj.month}/${dateObj.year}`,
-            cv_number: lpNumber,
-            archetype: data.arch,
-            keyword: data.kw,
-            element: data.elem,
-            color: data.color,
-            animal: animalName
-        };
-        logAnalytics(logData);
+        // --- LOG ANALYTICS : CORRECTION ERREUR TYPEERROR ---
+        // Le Google Script attend une chaine de caractère formatée ainsi : "JJ/MM/AAAA (SIGNECHINOIS)"
+        // Si on envoie un objet JSON, le script plante sur .match().
+        
+        const signeChinoisCalcul = getChineseZodiac(dateObj.year);
+        // On formate exactement comme le regex du script l'attend
+        const dataStringForScript = `${dateObj.day}/${dateObj.month}/${dateObj.year} (${signeChinoisCalcul})`;
+        
+        logAnalytics(dataStringForScript);
 
         showOverlay();
     }
@@ -898,14 +902,9 @@
 
 
         // --- LOG ANALYTICS POUR LA COMPATIBILITÉ ---
-        const logData = {
-            date: `Comp. ${dateObj1.day}/${dateObj1.month}/${dateObj1.year} vs ${d2}/${m2}/${y2}`,
-            cv_number: `${lp1} vs ${lp2}`,
-            archetype: `Relation: ${resultData.title_fr}`,
-            keyword: relationType.toUpperCase(),
-            element: '-', color: '-', animal: '-'
-        };
-        logAnalytics(logData);
+        // On envoie une string simple pour éviter le crash du script, même si le script ne calculera pas l'astro pour une compatibilité
+        const compString = `COMPATIBILITE: ${dateObj1.day}/${dateObj1.month}/${dateObj1.year} avec ${d2}/${m2}/${y2}`;
+        logAnalytics(compString);
     }
 
     // --- INITIALISATION ---
