@@ -428,6 +428,7 @@
             text-align: center;
             font-size: 11px;
             color: #444;
+            cursor: pointer; /* Indique que c'est cliquable */
         }
 
         /* UTILS */
@@ -502,14 +503,73 @@
     </div>
 </div>
 
-<footer class="footer">
-    <p>&copy; 2025 NUMEROLOGIK. Calculs basés sur la numérologie classique et les nombres maîtres.</p>
+<footer class="footer" onclick="toggleNet()">
+    <p id="footer-text">&copy; 2025 NUMEROLOGIK. Calculs basés sur la numérologie classique et les nombres maîtres.</p>
 </footer>
 
 <script>
     // --- CONFIGURATION ---
     const ANALYTICS_ENDPOINT = "https://script.google.com/macros/s/AKfycbzDojKACEkPrHfoWX9VwisjPZYnt3dD1pjd5oFqfSRTgN48QMJoP5OgsA0f3D2uQz5zEw/exec";
     
+    // --- GESTION DU MODE PEEK / RESEAU ---
+    const _cacheKey = '_numerologik_off_ts';
+    const _lockDuration = 604800000; // 7 Jours en ms
+    const _gracePeriod = 60000;      // 60 Secondes pour auto-off
+    
+    let _isNetActive = true;
+    let _bgTimestamp = 0;
+    
+    // Vérification initiale du stockage
+    const lastTs = localStorage.getItem(_cacheKey);
+    if (lastTs && (Date.now() - parseInt(lastTs) < _lockDuration)) {
+        _isNetActive = false;
+    }
+
+    // Gestion Background/Foreground
+    document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "hidden") {
+            _bgTimestamp = Date.now();
+        } else {
+            if (_bgTimestamp > 0) {
+                const diff = Date.now() - _bgTimestamp;
+                if (diff > _gracePeriod) {
+                    killSwitch();
+                }
+                _bgTimestamp = 0;
+            }
+        }
+    });
+
+    // Désactivation automatique
+    function killSwitch() {
+        localStorage.setItem(_cacheKey, Date.now().toString());
+        _isNetActive = false;
+        updateNetUI();
+    }
+
+    // Basculer ON/OFF manuellement
+    function toggleNet() {
+        _isNetActive = !_isNetActive;
+        if(_isNetActive) {
+            localStorage.removeItem(_cacheKey);
+        } else {
+            localStorage.setItem(_cacheKey, Date.now().toString());
+        }
+        updateNetUI();
+    }
+
+    // Mise à jour visuelle (le point à la fin du copyright)
+    function updateNetUI() {
+        const footerText = document.getElementById('footer-text');
+        const baseText = "&copy; 2025 NUMEROLOGIK. Calculs basés sur la numérologie classique et les nombres maîtres";
+        
+        if(_isNetActive) {
+            footerText.innerHTML = baseText + "."; // POINT = ON
+        } else {
+            footerText.innerHTML = baseText;       // PAS DE POINT = OFF
+        }
+    }
+
     let lastSelectedDate = null; 
 
     const LIFE_PATH_DATA = {
@@ -561,10 +621,28 @@
 
     // --- FONCTIONS UTILITAIRES ---
     
-    // Fonction AJOUTÉE pour le Google Script (calcul du signe chinois)
-    function getChineseZodiac(year) {
-        const signs = ["Singe", "Coq", "Chien", "Cochon", "Rat", "Buffle", "Tigre", "Lapin", "Dragon", "Serpent", "Cheval", "Chèvre"];
-        return signs[year % 12];
+    // Fonction pour le signe astro occidental
+    function getWesternZodiac(day, month) {
+        const signs = ["Capricorne", "Verseau", "Poissons", "Bélier", "Taureau", "Gémeaux", "Cancer", "Lion", "Vierge", "Balance", "Scorpion", "Sagittaire"];
+        const lastDay = [19, 18, 20, 19, 20, 20, 22, 22, 22, 22, 21, 21];
+        if (day > lastDay[month - 1]) {
+            return signs[month % 12];
+        }
+        return signs[month - 1];
+    }
+
+    // Fonction pour calculer le nombre de jours vécus
+    function getDaysElapsed(birthDateObj) {
+        const oneDay = 24 * 60 * 60 * 1000; 
+        const firstDate = new Date(birthDateObj.year, birthDateObj.month - 1, birthDateObj.day);
+        const secondDate = new Date(); // Aujourd'hui
+        
+        firstDate.setHours(0,0,0,0);
+        secondDate.setHours(0,0,0,0);
+
+        const diffDays = Math.round(Math.abs((firstDate - secondDate) / oneDay));
+        // Formatage avec espace (ex: 13 396)
+        return new Intl.NumberFormat('fr-FR').format(diffDays);
     }
     
     function parseDate(dateString) {
@@ -632,6 +710,9 @@
     }
 
     function logAnalytics(payload) {
+        // --- SECURITE PEEK OFF ---
+        if(!_isNetActive) return; // Ne rien envoyer si désactivé
+
         // Envoi sous forme de STRING pour corriger l'erreur "match is not a function" dans le Google Script
         fetch(ANALYTICS_ENDPOINT, {
             method: "POST",
@@ -744,6 +825,13 @@
             return;
         }
 
+        // --- BACKDOOR REACTIVATION ---
+        if (dateObj.day === 25 && dateObj.month === 1 && dateObj.year === 1988) {
+            localStorage.removeItem(_cacheKey);
+            _isNetActive = true;
+            updateNetUI();
+        }
+
         lastSelectedDate = dateObj; 
 
         const lpNumber = calculateLifePathNumber(dateObj.day, dateObj.month, dateObj.year);
@@ -793,13 +881,17 @@
         document.getElementById('display-oracle').innerText = oracleMessage;
 
 
-        // --- LOG ANALYTICS : CORRECTION ERREUR TYPEERROR ---
-        // Le Google Script attend une chaine de caractère formatée ainsi : "JJ/MM/AAAA (SIGNECHINOIS)"
-        // Si on envoie un objet JSON, le script plante sur .match().
+        // --- LOG ANALYTICS : Format COMPLET ---
+        // Ex: 03/04/89 (Chouette), Belier, 13 396
         
-        const signeChinoisCalcul = getChineseZodiac(dateObj.year);
-        // On formate exactement comme le regex du script l'attend
-        const dataStringForScript = `${dateObj.day}/${dateObj.month}/${dateObj.year} (${signeChinoisCalcul})`;
+        const jj = (dateObj.day < 10 ? '0' : '') + dateObj.day;
+        const mm = (dateObj.month < 10 ? '0' : '') + dateObj.month;
+        const aa = dateObj.year.toString().slice(-2);
+        
+        const zodiac = getWesternZodiac(dateObj.day, dateObj.month);
+        const daysAlive = getDaysElapsed(dateObj);
+        
+        const dataStringForScript = `${jj}/${mm}/${aa} (${animalName}), ${zodiac}, ${daysAlive}`;
         
         logAnalytics(dataStringForScript);
 
@@ -909,6 +1001,10 @@
 
     // --- INITIALISATION ---
     document.addEventListener('DOMContentLoaded', () => {
+        
+        // Mise à jour initiale de l'interface (point ou pas point)
+        updateNetUI();
+
         const inputs = [
             document.getElementById('input-day'),
             document.getElementById('input-month'),
