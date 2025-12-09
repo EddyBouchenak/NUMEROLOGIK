@@ -527,7 +527,80 @@
             font-size: 11px;
             color: #444;
             cursor: pointer;
-            /* Indique que c'est cliquable */
+        }
+
+        /* NOUVEAU STYLE TABLEAU COMPARATIF */
+        .comparison-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .comp-side {
+            flex: 1;
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 15px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .comp-visual-box {
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .comp-emoji-lg {
+            font-size: 50px;
+            filter: drop-shadow(0 0 5px rgba(240, 230, 140, 0.4));
+        }
+
+        .comp-img-lg {
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 5px rgba(240, 230, 140, 0.4));
+        }
+
+        .comp-date-header {
+            font-size: 13px;
+            color: var(--color-primary);
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .comp-row-item {
+            width: 100%;
+            border-top: 1px solid #333;
+            padding: 8px 0;
+            text-align: center;
+        }
+
+        .comp-label-sm {
+            font-size: 9px;
+            color: var(--color-subtext);
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .comp-val-sm {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--color-text);
+            display: block;
+        }
+
+        @media (max-width: 350px) {
+            .comparison-container {
+                flex-direction: column;
+            }
         }
 
         /* UTILS */
@@ -1125,31 +1198,67 @@
 
 
                 // --- AFFICHAGE DE COMPATIBILITÉ ---
-                const details2HTML = `
-            <div class="details-comp-card">
-                <div class="comp-card-header">
-                    <h3 style="margin-top:0;">Chemin de Vie ${lp2}</h3>
-                    <div class="display-date">${formattedDate2}</div>
-                </div>
-                
-                <span class="comp-label">Archétype</span>
-                <span class="comp-value">${data2.arch}</span>
-                
-                <span class="comp-label">Mot-Clé</span>
-                <span class="comp-value">${data2.kw}</span>
-                
-                <span class="comp-label">Élément</span>
-                <span class="comp-value">${data2.elem}</span>
-                
-                <span class="comp-label">Animal</span>
-                <span class="comp-value">${animalName2}</span>
-            </div>
-        `;
+                // --- AFFICHAGE DE COMPATIBILITÉ ---
+
+                // Helper pour générer le visuel (Emoji ou Image)
+                function getVisualHTML(lp, data) {
+                    if (lp === 11) {
+                        const imgPath = `assets/animal_${lp}.png?t=${new Date().getTime()}`;
+                        return `<img src="${imgPath}" class="comp-img-lg" alt="${data.animal}">`;
+                    } else {
+                        const emojiRegex = /[\uD800-\uDBFF][\uDC00-\uDFFF]|\uFE0F|[\u2600-\u26FF]|\u2700-\u27BF/g;
+                        const match = data.animal.match(emojiRegex);
+                        const emo = match ? match[0] : '🔮';
+                        return `<div class="comp-emoji-lg">${emo}</div>`;
+                    }
+                }
+
+                // Helper pour générer la colonne d'une personne
+                function generateSideHTML(lp, dateDay, dateMonth, dateYear, data) {
+                    const fDate = formatDateFr(dateDay, dateMonth, dateYear);
+                    const visual = getVisualHTML(lp, data);
+                    const animalName = data.animal.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]|\uFE0F|[\u2600-\u26FF]|\u2700-\u27BF/g, '').trim();
+
+                    return `
+                    <div class="comp-side">
+                        <div class="comp-visual-box">${visual}</div>
+                        <div class="comp-date-header">${fDate}</div>
+                        
+                        <div class="comp-row-item">
+                            <span class="comp-label-sm">Archétype</span>
+                            <span class="comp-val-sm">${data.arch}</span>
+                        </div>
+                        <div class="comp-row-item">
+                            <span class="comp-label-sm">Animal</span>
+                            <span class="comp-val-sm">${animalName}</span>
+                        </div>
+                        <div class="comp-row-item">
+                            <span class="comp-label-sm">Élément</span>
+                            <span class="comp-val-sm">${data.elem}</span>
+                        </div>
+                        <div class="comp-row-item">
+                            <span class="comp-label-sm">Couleur</span>
+                            <span class="comp-val-sm">${data.color}</span>
+                        </div>
+                        <div class="comp-row-item">
+                            <span class="comp-label-sm">Mot-Clé</span>
+                            <span class="comp-val-sm">${data.kw}</span>
+                        </div>
+                    </div>
+                 `;
+                }
+
+                const side1 = generateSideHTML(lp1, dateObj1.day, dateObj1.month, dateObj1.year, data1);
+                const side2 = generateSideHTML(lp2, d2, m2, y2, data2);
 
                 compResultDiv.innerHTML = `
             <div class="comp-title" id="comp-title">${resultData.title_fr}</div>
             <div class="comp-desc" id="comp-desc">${resultData.desc_fr} (Chemins ${lp1} et ${lp2})</div>
-            ${details2HTML}
+            
+            <div class="comparison-container">
+                ${side1}
+                ${side2}
+            </div>
         `;
                 compResultDiv.classList.remove('hidden');
 
