@@ -276,6 +276,26 @@
             display: inline-block;
         }
 
+        .animal-emoji {
+            font-size: 80px;
+            line-height: 1;
+            filter: drop-shadow(0 0 15px rgba(240, 230, 140, 0.4));
+            display: inline-block;
+            animation: floatEmoji 3s ease-in-out infinite;
+        }
+
+        @keyframes floatEmoji {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
         .display-date {
             font-size: 14px;
             font-weight: 500;
@@ -976,10 +996,19 @@
                 const oracleMessage = data.oracle[Math.floor(Math.random() * data.oracle.length)];
                 const formattedDate = formatDateFr(dateObj.day, dateObj.month, dateObj.year);
 
-                const imgPath = `assets/animal_${lpNumber}.png?t=${new Date().getTime()}`;
-                const emoji = data.animal.match(/[\uD800-\uDBFF][\uDC00-\uDFFF]|\uFE0F|[\u2600-\u26FF]|\u2700-\u27BF/g) ? data.animal.match(/[\uD800-\uDBFF][\uDC00-\uDFFF]|\uFE0F|[\u2600-\u26FF]|\u2700-\u27BF/g)[0] : '🔮';
+                const emojiRegex = /[\uD800-\uDBFF][\uDC00-\uDFFF]|\uFE0F|[\u2600-\u26FF]|\u2700-\u27BF/g;
+                const emojiMatch = data.animal.match(emojiRegex);
+                const emoji = emojiMatch ? emojiMatch[0] : '🔮';
+
                 const iconContainer = document.getElementById('display-icon');
-                iconContainer.innerHTML = `<img src="${imgPath}" alt="${data.animal}" class="animal-img" onerror="console.log('Error loading: ${imgPath}'); this.style.display='none'; this.nextElementSibling.style.display='inline';"> <span style="display:none; font-size:60px;">${emoji}</span>`;
+
+                // LOGIQUE D'AFFICHAGE : Image pour le 11 (Phénix), Emoji pour les autres
+                if (lpNumber === 11) {
+                    const imgPath = `assets/animal_${lpNumber}.png?t=${new Date().getTime()}`;
+                    iconContainer.innerHTML = `<img src="${imgPath}" alt="${data.animal}" class="animal-img" onerror="console.log('Error loading: ${imgPath}'); this.style.display='none';">`;
+                } else {
+                    iconContainer.innerHTML = `<div class="animal-emoji">${emoji}</div>`;
+                }
                 document.getElementById('display-date').innerText = formattedDate;
                 document.getElementById('display-title').innerText = `Chemin de Vie ${lpNumber}`;
                 document.getElementById('display-desc').innerText = data.desc;
