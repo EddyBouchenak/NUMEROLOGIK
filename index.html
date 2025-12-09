@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>NUMEROLOGIK - Chemin de Vie & Compatibilité</title>
+    <link rel="icon" type="image/jpeg" href="assets/logo_n.jpg">
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@300;400;500&display=swap"
         rel="stylesheet">
@@ -41,6 +42,20 @@
             text-align: center;
             margin: 20px 0 30px;
             letter-spacing: 1px;
+            /* Reset pour le logo image */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .main-logo {
+            width: 150px;
+            height: 150px;
+            object-fit: contain;
+            border-radius: 50%; /* Arrondi car l'image semble être un cercle */
+            border: 2px solid var(--color-primary);
+            padding: 5px;
+            /* background: rgba(0,0,0,0.5); optionnel si fond blanc trop agressif */
         }
 
         h2 {
@@ -484,7 +499,9 @@
 <body>
 
     <div class="container">
-        <h1 id="app-title">NUMEROLOGIK</h1>
+        <h1 id="app-title">
+            <img src="assets/logo_n.jpg" alt="NUMEROLOGIK" class="main-logo">
+        </h1>
 
         <section id="main-form">
             <h2>Votre Chemin de Vie</h2>
