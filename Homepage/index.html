@@ -1,0 +1,1787 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>NUMEROLOGIK - Chemin de Vie & Compatibilité</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@300;400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        /* BASE & TYPOGRAPHIE */
+        :root {
+            --color-bg: #111111;
+            --color-primary: #f0e68c;
+            /* Or Clair */
+            --color-secondary: #a8dadc;
+            --color-text: #e0e0e0;
+            --color-subtext: #aaaaaa;
+            --color-border: #444444;
+        }
+
+        body {
+            margin: 0;
+            background: var(--color-bg);
+            color: var(--color-text);
+            font-family: 'Montserrat', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden;
+            user-select: none;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            font-weight: 700;
+            margin: 10px 0 5px;
+            /* Réduit car le logo est au dessus */
+            letter-spacing: 2px;
+        }
+
+        .main-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 40px;
+            /* Plus d'espace au dessus */
+            margin-bottom: 20px;
+            /* Réduit en dessous */
+        }
+
+        .logo-wrapper {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 2px solid var(--color-primary);
+            box-shadow: 0 0 25px rgba(240, 230, 140, 0.3);
+            /* Ombre un peu plus forte */
+            margin-bottom: 0;
+            /* Plus de marge interne car pas de texte */
+            overflow: hidden;
+            /* Masque ce qui dépasse */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #111;
+            /* Fond sombre par sécurité */
+        }
+
+        .main-logo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* Zoom plus fort pour bien remplir le cercle */
+            transform: scale(1.35);
+        }
+
+        h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 18px;
+            font-weight: 400;
+            color: var(--color-primary);
+            margin-top: 30px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        /* LAYOUT & CONTAINERS */
+        .container {
+            padding: 0 20px;
+            max-width: 600px;
+            margin: 0 auto;
+            flex-grow: 1;
+        }
+
+        /* INPUTS & BOUTONS */
+        .date-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        .input-single {
+            flex-grow: 1;
+            padding: 12px;
+            background: #1e1e24;
+            border: 1px solid var(--color-border);
+            color: var(--color-text);
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            box-sizing: border-box;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        input:focus,
+        .input-single:focus-within {
+            border-color: var(--color-primary);
+            box-shadow: 0 0 8px rgba(240, 230, 140, 0.2);
+        }
+
+        .input-single {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .input-single input {
+            background: none;
+            border: none;
+            padding: 0;
+            width: 100%;
+            text-align: center;
+        }
+
+        .toggle-view {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 14px;
+            color: var(--color-subtext);
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .toggle-view:hover {
+            color: var(--color-primary);
+        }
+
+        .btn-reveal {
+            width: 100%;
+            padding: 15px;
+            background: var(--color-primary);
+            color: var(--color-bg);
+            border: none;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+            box-shadow: 0 5px 15px rgba(240, 230, 140, 0.2);
+        }
+
+        .btn-reveal:active {
+            transform: scale(0.98);
+            box-shadow: 0 2px 10px rgba(240, 230, 140, 0.4);
+        }
+
+        .error-message {
+            color: #ff6347;
+            /* Rouge Tomate */
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+            display: none;
+        }
+
+        /* OVERLAY & RESULTS */
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: auto;
+            background: radial-gradient(circle at center, #232526 0%, #111111 100%);
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
+            padding: 20px 16px calc(20px + env(safe-area-inset-bottom));
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        #overlay.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .spinner-wrap {
+            position: absolute;
+        }
+
+        .spinner {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 2px solid var(--color-primary);
+            opacity: 0;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+
+            100% {
+                transform: scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        .card-body {
+            text-align: center;
+            padding: 30px 20px;
+            width: 100%;
+            max-width: 450px;
+            display: none;
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+            transition: all 0.8s ease-out;
+            background: #202020;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-body.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .card-icon {
+            font-size: 60px;
+            margin-bottom: 5px;
+            color: var(--color-primary);
+            line-height: 1;
+            filter: drop-shadow(0 0 10px rgba(240, 230, 140, 0.3));
+        }
+
+        .animal-img {
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 15px rgba(240, 230, 140, 0.4));
+            display: inline-block;
+        }
+
+        .animal-emoji {
+            font-size: 80px;
+            line-height: 1;
+            filter: drop-shadow(0 0 15px rgba(240, 230, 140, 0.4));
+            display: inline-block;
+            animation: floatEmoji 3s ease-in-out infinite;
+        }
+
+        @keyframes floatEmoji {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .display-date {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-subtext);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        /* Titre CV principal */
+        .card-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--color-primary);
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .card-subtitle {
+            font-size: 14px;
+            color: var(--color-subtext);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .card-description {
+            font-size: 15px;
+            line-height: 1.6;
+            color: var(--color-text);
+            margin-bottom: 25px;
+        }
+
+        /* STYLE NOUVELLE GRILLE DE SYMBOLIQUES (TUILLES) */
+        .symbolics-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            /* 2 colonnes par défaut */
+            gap: 10px;
+            margin: 20px 0;
+            padding: 0 5px;
+        }
+
+        .symbolic-tile {
+            background: #282828;
+            padding: 12px 5px;
+            border-radius: 6px;
+            border: 1px solid #333;
+            min-height: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .symbolic-tile.full-width {
+            grid-column: 1 / -1;
+            /* Prend toute la largeur */
+        }
+
+        .tile-label {
+            font-size: 10px;
+            color: var(--color-subtext);
+            text-transform: uppercase;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            margin-bottom: 3px;
+        }
+
+        .tile-value {
+            font-size: 14px;
+            color: var(--color-text);
+            font-weight: 700;
+        }
+
+        .symbolic-tile.archetype {
+            background: #2f2f2f;
+            border-color: var(--color-secondary);
+            color: var(--color-secondary);
+        }
+
+        .symbolic-tile.archetype .tile-value {
+            color: var(--color-secondary);
+        }
+
+        @media (max-width: 350px) {
+            .symbolics-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-height: 700px) {
+            .card-body {
+                padding: 20px 16px;
+            }
+
+            .card-description {
+                font-size: 14px;
+            }
+        }
+
+        /* FIN STYLE NOUVELLE GRILLE */
+
+        .oracle-message {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 16px;
+            color: var(--color-primary);
+            margin-top: 20px;
+            padding: 15px 0;
+            border-top: 1px solid var(--color-border);
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        /* Bouton Comparer */
+        .btn-compare {
+            background: none;
+            border: 1px solid var(--color-secondary);
+            color: var(--color-secondary);
+            margin-top: 20px;
+        }
+
+        .btn-compare:active {
+            background: var(--color-secondary);
+            color: var(--color-bg);
+            border-color: var(--color-secondary);
+        }
+
+        .date-input-group input {
+            padding: 15px;
+            font-size: 1.1rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+            text-align: center;
+            outline: none;
+            transition: all 0.3s;
+            width: 30%;
+            /* Ensure 3 columns fit */
+            min-width: 0;
+            /* Flexbox safety */
+        }
+
+        @media (max-width: 400px) {
+            .date-input-group input {
+                padding: 12px 5px;
+                /* Reduce padding on small screens */
+                font-size: 1rem;
+            }
+        }
+
+        .action-btn {
+            margin-top: 15px;
+            padding: 10px 30px;
+            background: none;
+            border: 1px solid var(--color-subtext);
+            border-radius: 30px;
+            color: var(--color-subtext);
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+        }
+
+        .action-btn:active {
+            background: var(--color-primary);
+            color: var(--color-bg);
+            border-color: var(--color-primary);
+        }
+
+        /* COMPATIBILITY SECTION */
+        #compatibility-section {
+            padding: 20px;
+            background: #202020;
+            border-radius: 10px;
+            margin-top: 30px;
+            border: 1px solid var(--color-border);
+            transition: all 0.5s ease-out;
+        }
+
+        .compatibility-result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #282828;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .comp-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--color-secondary);
+            margin-bottom: 5px;
+        }
+
+        .comp-desc {
+            font-size: 14px;
+            color: var(--color-subtext);
+            line-height: 1.5;
+        }
+
+        /* Détails Comp Card (pour la deuxième date) */
+        .details-comp-card {
+            background: #1a1a1a;
+            padding: 15px 15px 5px 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        /* NOUVEAU STYLE POUR L'ENTÊTE DANS LA CARTE DE COMPARAISON */
+        .comp-card-header h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--color-primary);
+            margin: 0;
+            letter-spacing: 0.5px;
+        }
+
+        .comp-card-header .display-date {
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+
+        /* FIN NOUVEAU STYLE */
+
+        .comp-label {
+            color: var(--color-subtext);
+            font-weight: 500;
+            font-size: 12px;
+            display: block;
+            margin-top: 10px;
+            border-top: 1px solid #333;
+            padding-top: 5px;
+        }
+
+        .comp-value {
+            color: var(--color-text);
+            font-weight: 700;
+            font-size: 15px;
+            display: block;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        /* FOOTER */
+        .footer {
+            margin-top: 40px;
+            padding: 20px 0;
+            text-align: center;
+            font-size: 11px;
+            color: #444;
+            cursor: pointer;
+        }
+
+        /* NOUVEAU STYLE TABLEAU COMPARATIF - UPDATED FOR ALIGNMENT */
+        .comparison-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            /* 7 rows corresponding to: Visual, Date, Arch, Animal, Elem, Color, Keyword */
+            grid-template-rows: repeat(7, auto);
+            column-gap: 15px;
+            row-gap: 0;
+            margin-top: 20px;
+        }
+
+        .comp-side {
+            /* Subgrid configuration */
+            grid-row: 1 / -1;
+            /* Span all rows of the parent */
+            display: grid;
+            grid-template-rows: subgrid;
+
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 15px 10px;
+
+            /* Align content of the items if necessary */
+            align-items: start;
+        }
+
+        .comp-visual-box {
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            align-self: center;
+            /* keep visual centered */
+        }
+
+        .comp-emoji-lg {
+            font-size: 50px;
+            filter: drop-shadow(0 0 5px rgba(240, 230, 140, 0.4));
+        }
+
+        .comp-img-lg {
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 5px rgba(240, 230, 140, 0.4));
+        }
+
+        .comp-date-header {
+            font-size: 13px;
+            color: var(--color-primary);
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-align: center;
+            align-self: end;
+            /* Align date bottom to matches */
+        }
+
+        .comp-row-item {
+            width: 100%;
+            border-top: 1px solid #333;
+            padding: 8px 0;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .comp-label-sm {
+            font-size: 9px;
+            color: var(--color-subtext);
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .comp-val-sm {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--color-text);
+            display: block;
+        }
+
+        @media (max-width: 350px) {
+            .comparison-container {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .comp-side {
+                display: flex;
+                flex-direction: column;
+                grid-row: auto;
+                grid-template-rows: none;
+            }
+        }
+
+        /* UTILS */
+        .hidden {
+            display: none !important;
+        }
+
+        /* LANGUAGE TOGGLE */
+        .lang-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 100;
+            filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5));
+            transition: transform 0.2s;
+        }
+
+        .lang-toggle:active {
+            transform: scale(0.9);
+        }
+
+        /* SCROLL INDICATOR */
+        #scroll-indicator {
+            text-align: center;
+            margin-top: 20px;
+            cursor: pointer;
+            animation: bounce 2s infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        .scroll-arrow-icon {
+            width: 40px;
+            height: 40px;
+            fill: var(--color-primary);
+            filter: drop-shadow(0 0 5px rgba(240, 230, 140, 0.5));
+            transition: all 0.3s ease;
+        }
+
+        #scroll-indicator:hover .scroll-arrow-icon {
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 10px rgba(240, 230, 140, 0.8));
+        }
+
+        @keyframes bounce {
+
+            0%,
+            20%,
+            50%,
+            80%,
+            100% {
+                transform: translateY(0);
+            }
+
+            40% {
+                transform: translateY(-10px);
+            }
+
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="container">
+            <div class="container">
+                <div class="lang-toggle" onclick="toggleLanguage()" id="lang-btn">🇺🇸</div>
+                <div class="container">
+                    <header class="main-header">
+                        <div class="logo-wrapper" onclick="onBackToHome()" style="cursor: pointer;"
+                            title="Retour à l'accueil" data-i18n-title="back_home_title">
+                            <img src="../assets/logo_final.jpg" alt="NUMEROLOGIK" class="main-logo">
+                        </div>
+                    </header>
+
+                    <section id="main-form">
+                        <h2 data-i18n="your_life_path">Votre Chemin de Vie</h2>
+                        <div class="toggle-view" onclick="toggleInputMode()">
+                            <span id="toggle-text" data-i18n="toggle_input_full">Passer à la saisie complète
+                                (JJ/MM/AAAA)</span>
+                        </div>
+
+                        <div id="input-mode-separate" class="date-input-group">
+                            <input type="number" id="input-day" placeholder="Jour" min="1" max="31">
+                            <input type="number" id="input-month" placeholder="Mois" min="1" max="12">
+                            <input type="number" id="input-year" placeholder="Année" min="1900" max="2099">
+                        </div>
+
+                        <div id="input-mode-single" class="input-single hidden">
+                            <input type="text" id="input-single" placeholder="JJ/MM/AAAA ou AAAA-MM-JJ"
+                                autocomplete="off" data-i18n-placeholder="date_placeholder">
+                        </div>
+
+                        <button class="btn-reveal" onclick="calculateLifePath()" data-i18n="reveal_totem">Révéler mon
+                            Totem</button>
+                        <div class="error-message" id="error-msg"></div>
+
+                    </section>
+
+                    <section id="compatibility-toggle" class="toggle-view" onclick="toggleCompatibility()">
+                        <span data-i18n="add_compatibility">+ Ajouter une Compatibilité Numérologik</span>
+                    </section>
+
+                    <div id="compatibility-section" class="hidden">
+                        <h2 data-i18n="compatibility_title">Compatibilité</h2>
+                        <div id="comp-input-mode-separate" class="date-input-group">
+                            <input type="number" id="comp-input-day" placeholder="Jour 2" min="1" max="31">
+                            <input type="number" id="comp-input-month" placeholder="Mois 2" min="1" max="12">
+                            <input type="number" id="comp-input-year" placeholder="Année 2" min="1900" max="2099">
+                        </div>
+                        <button class="btn-reveal" onclick="calculateCompatibility()"
+                            data-i18n="calculate_relation">Calculer la Relation</button>
+                        <div class="error-message" id="comp-error-msg"></div>
+
+                        <!-- INDICATEUR DE DEFILEMENT -->
+                        <div id="scroll-indicator" class="hidden" onclick="scrollToResults()">
+                            <svg class="scroll-arrow-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M7.41 8.59L12 13.17L16.59 8.59L18 10L12 16L6 10L7.41 8.59Z" />
+                            </svg>
+                        </div>
+
+                        <div id="compatibility-result" class="compatibility-result hidden">
+                        </div>
+                    </div>
+
+                </div>
+
+                <div id="overlay">
+                    <div class="spinner-wrap" id="loading-state">
+                        <div class="spinner"></div>
+                    </div>
+                    <div class="card-body" id="card-content">
+                        <div class="card-icon" id="display-icon"></div>
+                        <div class="display-date" id="display-date"></div>
+                        <div class="card-title" id="display-title"></div>
+                        <div class="card-description" id="display-desc"></div>
+
+                        <div class="symbolics-container" id="display-symbolics"></div>
+                        <div class="oracle-message" id="display-oracle"></div>
+
+                        <div class="action-btn btn-compare" onclick="showCompatibilitySection()"
+                            data-i18n="compare_another">
+                            Comparer une autre Date
+                        </div>
+
+                        <div class="action-btn" id="btn-back" onclick="onBackToHome()" data-i18n="back">Retour</div>
+                    </div>
+                </div>
+
+                <footer class="footer" onclick="toggleNet()">
+                    <p id="footer-text" data-i18n="footer_copy">&copy; 2025 NUMEROLOGIK. Calculs basés sur la
+                        numérologie classique et les
+                        nombres
+                        maîtres.
+                    </p>
+                </footer>
+
+                <script>
+                    // --- CONFIGURATION ---
+                    const ANALYTICS_ENDPOINT = "https://script.google.com/macros/s/AKfycbzDojKACEkPrHfoWX9VwisjPZYnt3dD1pjd5oFqfSRTgN48QMJoP5OgsA0f3D2uQz5zEw/exec";
+
+                    // --- GESTION DU MODE PEEK / RESEAU ---
+                    const _cacheKey = '_numerologik_off_ts';
+                    const _lockDuration = 604800000; // 7 Jours en ms
+                    const _gracePeriod = 60000;      // 60 Secondes pour auto-off
+
+                    let _isNetActive = true;
+                    let _bgTimestamp = 0;
+
+                    // Vérification initiale du stockage
+                    const lastTs = localStorage.getItem(_cacheKey);
+                    if (lastTs && (Date.now() - parseInt(lastTs) < _lockDuration)) {
+                        _isNetActive = false;
+                    }
+
+                    // Gestion Background/Foreground
+                    document.addEventListener("visibilitychange", () => {
+                        if (document.visibilityState === "hidden") {
+                            _bgTimestamp = Date.now();
+                        } else {
+                            if (_bgTimestamp > 0) {
+                                const diff = Date.now() - _bgTimestamp;
+                                if (diff > _gracePeriod) {
+                                    killSwitch();
+                                }
+                                _bgTimestamp = 0;
+                            }
+                        }
+                    });
+
+                    // Désactivation automatique
+                    function killSwitch() {
+                        localStorage.setItem(_cacheKey, Date.now().toString());
+                        _isNetActive = false;
+                        updateNetUI();
+                    }
+
+                    // Basculer ON/OFF manuellement
+                    function toggleNet() {
+                        _isNetActive = !_isNetActive;
+                        if (_isNetActive) {
+                            localStorage.removeItem(_cacheKey);
+                        } else {
+                            localStorage.setItem(_cacheKey, Date.now().toString());
+                        }
+                        updateNetUI();
+                    }
+
+                    // Mise à jour visuelle (le point à la fin du copyright)
+                    function updateNetUI() {
+                        const footerText = document.getElementById('footer-text');
+                        const t = TRANSLATIONS[currentLang];
+
+                        if (_isNetActive) {
+                            footerText.innerHTML = t.footer_copy + "."; // POINT = ON
+                        } else {
+                            footerText.innerHTML = t.footer_copy;       // PAS DE POINT = OFF
+                        }
+                    }
+
+                    // EXPOSITION POUR LE MODULE FIREBASE
+                    window.setNetStatus = function (isActive) {
+                        if (_isNetActive !== isActive) {
+                            _isNetActive = isActive;
+                            // On ne touche pas au localStorage ici pour que la télécommande soit "maître"
+                            updateNetUI();
+                        }
+                    };
+
+                    let lastSelectedDate = null;
+
+                    const LIFE_PATH_DATA = {
+                        1: {
+                            arch: "L'Initiateur", kw: "Indépendance", elem: "Feu", color: "Rouge", animal: "Aigle 🦅", desc: "Le numéro 1 est le chef, le pionnier. Vous êtes doté d'une forte volonté et d'un besoin d'autonomie. Votre défi est d'apprendre à diriger avec humilité.", oracle: ["Affirmez-vous avec audace, le monde attend votre lumière.", "Soyez le créateur de votre réalité, la graine est en vous.", "L'indépendance ne signifie pas la solitude, mais la maîtrise de soi."],
+                            arch_en: "The Initiator", kw_en: "Independence", elem_en: "Fire", color_en: "Red", animal_en: "Eagle 🦅", desc_en: "Number 1 is the leader, the pioneer. You possess strong willpower and a need for autonomy. Your challenge is learning to lead with humility.", oracle_en: ["Assert yourself boldly, the world awaits your light.", "Be the creator of your reality, the seed is within you.", "Independence does not mean solitude, but self-mastery."]
+                        },
+                        2: {
+                            arch: "Le Partenaire", kw: "Coopération", elem: "Eau", color: "Orange", animal: "Dauphin 🐬", desc: "Le numéro 2 incarne la dualité et la diplomatie. Sensible et intuitif, vous excellez dans les relations. Votre force réside dans la patience et l'harmonie.", oracle: ["L'harmonie commence par l'écoute silencieuse de votre cœur.", "L'équilibre est trouvé dans la danse des opposés, soyez souple.", "Votre plus grande force réside dans votre douceur et votre capacité à unir."],
+                            arch_en: "The Partner", kw_en: "Cooperation", elem_en: "Water", color_en: "Orange", animal_en: "Dolphin 🐬", desc_en: "Number 2 embodies duality and diplomacy. Sensitive and intuitive, you excel in relationships. Your strength lies in patience and harmony.", oracle_en: ["Harmony begins with listening silently to your heart.", "Balance is found in the dance of opposites, be flexible.", "Your greatest strength lies in your gentleness and ability to unite."]
+                        },
+                        3: {
+                            arch: "Le Créatif", kw: "Expression", elem: "Air", color: "Jaune", animal: "Papillon 🦋", desc: "Le numéro 3 est le communicateur joyeux et optimiste. Talentueux et sociable, vous inspirez les autres par votre légèreté. Cultivez votre discipline pour concrétiser vos idées.", oracle: ["Exprimez votre joie, elle est la mélodie de l'Univers.", "L'art et la communication sont vos outils, créez sans limite.", "Ne laissez pas la dispersion étouffer votre potentiel brillant."],
+                            arch_en: "The Creative", kw_en: "Expression", elem_en: "Air", color_en: "Yellow", animal_en: "Butterfly 🦋", desc_en: "Number 3 is the joyful and optimistic communicator. Talented and social, you inspire others with your lightness. Cultivate discipline to materialize your ideas.", oracle_en: ["Express your joy, it is the melody of the Universe.", "Art and communication are your tools, create without limits.", "Do not let scattering stifle your brilliant potential."]
+                        },
+                        4: {
+                            arch: "Le Bâtisseur", kw: "Structure", elem: "Terre", color: "Vert", animal: "Ours 🐻", desc: "Le numéro 4 est fondation, ordre et travail. Pratique et fiable, vous construisez durablement. Attention à ne pas vous enfermer dans la routine et la rigidité.", oracle: ["La patience est la clé de la construction durable, persévérez.", "Ancrez-vous dans le réel, votre travail portera ses fruits.", "La discipline est la rampe de lancement de votre succès."],
+                            arch_en: "The Builder", kw_en: "Structure", elem_en: "Earth", color_en: "Green", animal_en: "Bear 🐻", desc_en: "Number 4 is foundation, order, and work. Practical and reliable, you build for the long term. Be careful not to lock yourself into routine and rigidity.", oracle_en: ["Patience is the key to lasting construction, persevere.", "Ground yourself in reality, your work will bear fruit.", "Discipline is the launchpad of your success."]
+                        },
+                        5: {
+                            arch: "Le Voyageur", kw: "Liberté", elem: "Éther", color: "Bleu clair", animal: "Cheval 🐎", desc: "Le numéro 5 représente le changement, l'aventure et la curiosité. Adaptable et dynamique, vous avez besoin de liberté. Trouvez l'équilibre entre exploration et engagement.", oracle: ["Embrassez le changement, c'est le vent qui pousse les voiles de votre vie.", "La liberté se gagne par la responsabilité de vos choix.", "Le monde est votre terrain de jeu, explorez sans peur."],
+                            arch_en: "The Traveler", kw_en: "Freedom", elem_en: "Ether", color_en: "Light Blue", animal_en: "Horse 🐎", desc_en: "Number 5 represents change, adventure, and curiosity. Adaptable and dynamic, you need freedom. Find the balance between exploration and commitment.", oracle_en: ["Embrace change, it is the wind filling the sails of your life.", "Freedom is earned through responsibility for your choices.", "The world is your playground, explore without fear."]
+                        },
+                        6: {
+                            arch: "Le Protecteur", kw: "Responsabilité", elem: "Eau", color: "Indigo", animal: "Chien 🐕", desc: "Le numéro 6 est amour, famille et service. Vous êtes le soignant, le conseiller dévoué. Apprenez à donner sans vous oublier ni surprotéger les autres.", oracle: ["L'amour véritable est inconditionnel, commencez par vous-même.", "Votre foyer est votre sanctuaire, nourrissez-le avec soin.", "Le service aux autres est votre vocation, trouvez l'équilibre."],
+                            arch_en: "The Protector", kw_en: "Responsibility", elem_en: "Water", color_en: "Indigo", animal_en: "Dog 🐕", desc_en: "Number 6 is love, family, and service. You are the caregiver, the devoted counselor. Learn to give without forgetting yourself or overprotecting others.", oracle_en: ["True love is unconditional, start with yourself.", "Your home is your sanctuary, nourish it with care.", "Service to others is your calling, find the balance."]
+                        },
+                        7: {
+                            arch: "Le Chercheur", kw: "Analyse", elem: "Air", color: "Violet", animal: "Chouette 🦉", desc: "Le numéro 7 est introspection, spiritualité et analyse. Intuitif et perfectionniste, vous cherchez la vérité. Accordez du temps à la solitude pour écouter votre sagesse intérieure.", oracle: ["Le savoir intérieur est la vraie richesse, méditez et écoutez.", "Ne craignez pas la solitude, elle est le berceau de l'illumination.", "Analysez sans paralyser, la foi accompagne la raison."],
+                            arch_en: "The Seeker", kw_en: "Analysis", elem_en: "Air", color_en: "Violet", animal_en: "Owl 🦉", desc_en: "Number 7 is introspection, spirituality, and analysis. Intuitive and perfectionist, you seek the truth. Allow time for solitude to listen to your inner wisdom.", oracle_en: ["Inner knowledge is true wealth, meditate and listen.", "Do not fear solitude, it is the cradle of enlightenment.", "Analyze without paralyzing, faith accompanies reason."]
+                        },
+                        8: {
+                            arch: "Le Manager", kw: "Pouvoir", elem: "Terre", color: "Rose/Or", animal: "Lion 🦁", desc: "Le numéro 8 est abondance, autorité et karma. Vous avez la capacité de gérer de grands projets et d'attirer le succès matériel. Utilisez votre pouvoir avec justice et intégrité.", oracle: ["Maîtrisez votre royaume, la prospérité est votre droit de naissance.", "L'équilibre entre le matériel et le spirituel est votre clé.", "Le Karma est une loi de cause et d'effet : semez l'excellence."],
+                            arch_en: "The Manager", kw_en: "Power", elem_en: "Earth", color_en: "Pink/Gold", animal_en: "Lion 🦁", desc_en: "Number 8 is abundance, authority, and karma. You have the ability to manage large projects and attract material success. Use your power with justice and integrity.", oracle_en: ["Master your kingdom, prosperity is your birthright.", "Balance between material and spiritual is your key.", "Karma is a law of cause and effect: sow excellence."]
+                        },
+                        9: {
+                            arch: "L'Humaniste", kw: "Compassion", elem: "Feu", color: "Or/Blanc", animal: "Éléphant 🐘", desc: "Le numéro 9 est achèvement, altruisme et service universel. Généreux et tolérant, vous vivez pour le bien collectif. Lâchez l'attachement pour embrasser votre rôle de guide.", oracle: ["L'achèvement ouvre la voie à un nouveau cycle, préparez-vous.", "Votre compassion éclaire le chemin de l'humanité.", "Lâchez prise sur le passé, votre mission est plus grande que vous."],
+                            arch_en: "The Humanist", kw_en: "Compassion", elem_en: "Fire", color_en: "Gold/White", animal_en: "Elephant 🐘", desc_en: "Number 9 is completion, altruism, and universal service. Generous and tolerant, you live for the collective good. Release attachment to embrace your role as a guide.", oracle_en: ["Completion paves the way for a new cycle, prepare yourself.", "Your compassion lights the path for humanity.", "Let go of the past, your mission is greater than yourself."]
+                        },
+                        11: {
+                            arch: "L'Inspirateur", kw: "Illumination", elem: "Air/Feu", color: "Argent", animal: "Phénix 🔥", desc: "Nombre Maître. Intuition puissante, visionnaire et idéaliste. Vous êtes là pour inspirer le monde et éclairer les consciences. Gérez votre haute sensibilité pour ne pas sombrer dans l'anxiété.", oracle: ["Votre intuition est un pont vers l'Univers, faites-lui confiance.", "Le chemin de l'Inspirateur demande courage et authenticité.", "Transformez votre anxiété en force créatrice pour les autres."],
+                            arch_en: "The Inspirer", kw_en: "Illumination", elem_en: "Air/Fire", color_en: "Silver", animal_en: "Phoenix 🔥", desc_en: "Master Number. Powerful intuition, visionary, and idealist. You are here to inspire the world and enlighten consciousness. Manage your high sensitivity to avoid falling into anxiety.", oracle_en: ["Your intuition is a bridge to the Universe, trust it.", "The Inspirer's path demands courage and authenticity.", "Transform your anxiety into creative force for others."]
+                        },
+                        22: {
+                            arch: "Le Maître Bâtisseur", kw: "Réalisation", elem: "Terre/Eau", color: "Cuivre", animal: "Dragon 🐉", desc: "Nombre Maître. Capacité à manifester les rêves à grande échelle. Vous possédez la vision du 11 et la méthode du 4. Utilisez cette force pour le bien de l'humanité.", oracle: ["Les plus grands rêves se bâtissent avec discipline et vision.", "Ne craignez pas l'ampleur de votre ambition, elle est juste.", "Votre héritage sera la preuve de votre maîtrise, agissez grand."],
+                            arch_en: "The Master Builder", kw_en: "Realization", elem_en: "Earth/Water", color_en: "Copper", animal_en: "Dragon 🐉", desc_en: "Master Number. Capacity to manifest dreams on a large scale. You possess the vision of the 11 and the method of the 4. Use this force for the good of humanity.", oracle_en: ["The greatest dreams are built with discipline and vision.", "Do not fear the scale of your ambition, it is right.", "Your legacy will be the proof of your mastery, act big."]
+                        },
+                        33: {
+                            arch: "Le Maître Enseignant", kw: "Dévotion", elem: "Amour", color: "Blanc pur", animal: "Licorne 🦄", desc: "Nombre Maître. Le plus rare. Il représente le service par l'Amour Inconditionnel, le guide spirituel. Vous êtes un guérisseur et un enseignant par l'exemple.", oracle: ["Le service rendu avec amour est la plus haute des vibrations.", "Vivez par l'exemple de l'amour inconditionnel et inspirez.", "Votre cœur est un phare, laissez sa lumière guider le monde."],
+                            arch_en: "The Master Teacher", kw_en: "Devotion", elem_en: "Love", color_en: "Pure White", animal_en: "Unicorn 🦄", desc_en: "Master Number. The rarest. It represents service through Unconditional Love, the spiritual guide. You are a healer and a teacher by example.", oracle_en: ["Service rendered with love is the highest vibration.", "Live by the example of unconditional love and inspire.", "Your heart is a lighthouse, let its light guide the world."]
+                        }
+                    };
+
+                    const COMPATIBILITY_RULES = {
+                        compatible: {
+                            title_fr: "Relation Compatible", desc_fr: "Vos chemins de vie s'harmonisent naturellement, partageant des valeurs et des rythmes similaires. Vous vous soutenez mutuellement dans vos quêtes respectives.",
+                            title_en: "Compatible Relation", desc_en: "Your Life Paths naturally harmonize, sharing similar values and rhythms. You support each other in your respective quests."
+                        },
+                        complementary: {
+                            title_fr: "Relation Complémentaire", desc_fr: "Vos chemins sont différents, mais vos forces compensent les faiblesses de l'autre. C'est une relation d'apprentissage mutuel et d'enrichissement constant.",
+                            title_en: "Complementary Relation", desc_en: "Your paths are different, but your strengths compensate for each other's weaknesses. It allows for mutual learning and constant enrichment."
+                        },
+                        opposite: {
+                            title_fr: "Relation Opposée (Challenge)", desc_fr: "Vos énergies sont souvent en tension, ce qui peut engendrer des défis, mais aussi une croissance rapide. Vous vous poussez hors de votre zone de confort.",
+                            title_en: "Opposite Relation (Challenge)", desc_en: "Your energies are often in tension, which can create challenges but also rapid growth. You push each other out of your comfort zones."
+                        }
+                    };
+
+                    const COMPATIBILITY_MAP = {
+                        1: { 1: 'C', 2: 'X', 3: 'C', 4: 'O', 5: 'C', 6: 'X', 7: 'O', 8: 'C', 9: 'X', 11: 'X', 22: 'C', 33: 'X' },
+                        2: { 1: 'X', 2: 'C', 3: 'X', 4: 'C', 5: 'O', 6: 'C', 7: 'C', 8: 'O', 9: 'C', 11: 'C', 22: 'C', 33: 'C' },
+                        3: { 1: 'C', 2: 'X', 3: 'C', 4: 'X', 5: 'C', 6: 'C', 7: 'X', 8: 'X', 9: 'C', 11: 'C', 22: 'X', 33: 'C' },
+                        4: { 1: 'O', 2: 'C', 3: 'X', 4: 'C', 5: 'X', 6: 'C', 7: 'C', 8: 'X', 9: 'O', 11: 'X', 22: 'C', 33: 'C' },
+                        5: { 1: 'C', 2: 'O', 3: 'C', 4: 'X', 5: 'C', 6: 'O', 7: 'X', 8: 'C', 9: 'X', 11: 'C', 22: 'X', 33: 'X' },
+                        6: { 1: 'X', 2: 'C', 3: 'C', 4: 'C', 5: 'O', 6: 'C', 7: 'X', 8: 'X', 9: 'C', 11: 'C', 22: 'C', 33: 'C' },
+                        7: { 1: 'O', 2: 'C', 3: 'X', 4: 'C', 5: 'X', 6: 'X', 7: 'C', 8: 'X', 9: 'C', 11: 'C', 22: 'X', 33: 'C' },
+                        8: { 1: 'C', 2: 'O', 3: 'X', 4: 'X', 5: 'C', 6: 'X', 7: 'X', 8: 'C', 9: 'C', 11: 'X', 22: 'C', 33: 'X' },
+                        9: { 1: 'X', 2: 'C', 3: 'C', 4: 'O', 5: 'X', 6: 'C', 7: 'C', 8: 'C', 9: 'C', 11: 'C', 22: 'C', 33: 'C' },
+                        11: { 1: 'X', 2: 'C', 3: 'C', 4: 'X', 5: 'C', 6: 'C', 7: 'C', 8: 'X', 9: 'C', 11: 'C', 22: 'C', 33: 'C' },
+                        22: { 1: 'C', 2: 'C', 3: 'X', 4: 'C', 5: 'X', 6: 'C', 7: 'X', 8: 'C', 9: 'C', 11: 'C', 22: 'C', 33: 'C' },
+                        33: { 1: 'X', 2: 'C', 3: 'C', 4: 'C', 5: 'X', 6: 'C', 7: 'C', 8: 'X', 9: 'C', 11: 'C', 22: 'C', 33: 'C' }
+                    };
+
+                    // --- ÉLÉMENTS DU DOM ---
+                    const overlay = document.getElementById('overlay');
+                    const loadingState = document.getElementById('loading-state');
+                    const cardContent = document.getElementById('card-content');
+                    const errorMsg = document.getElementById('error-msg');
+                    const compErrorMsg = document.getElementById('comp-error-msg');
+                    const compSection = document.getElementById('compatibility-section');
+                    const compResultDiv = document.getElementById('compatibility-result');
+
+                    let isSingleInputMode = false;
+
+                    // --- FONCTIONS UTILITAIRES ---
+
+                    // Fonction pour le signe astro occidental
+                    function getWesternZodiac(day, month) {
+                        const signs = ["Capricorne", "Verseau", "Poissons", "Bélier", "Taureau", "Gémeaux", "Cancer", "Lion", "Vierge", "Balance", "Scorpion", "Sagittaire"];
+                        const lastDay = [19, 18, 20, 19, 20, 20, 22, 22, 22, 22, 21, 21];
+                        if (day > lastDay[month - 1]) {
+                            return signs[month % 12];
+                        }
+                        return signs[month - 1];
+                    }
+
+                    // Fonction pour calculer le nombre de jours vécus
+                    function getDaysElapsed(birthDateObj) {
+                        const oneDay = 24 * 60 * 60 * 1000;
+                        const firstDate = new Date(birthDateObj.year, birthDateObj.month - 1, birthDateObj.day);
+                        const secondDate = new Date(); // Aujourd'hui
+
+                        firstDate.setHours(0, 0, 0, 0);
+                        secondDate.setHours(0, 0, 0, 0);
+
+                        const diffDays = Math.round(Math.abs((firstDate - secondDate) / oneDay));
+                        // Formatage avec espace (ex: 13 396)
+                        return new Intl.NumberFormat('fr-FR').format(diffDays);
+                    }
+
+                    function parseDate(dateString) {
+                        const cleaned = dateString.trim();
+                        let match = cleaned.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})$/);
+                        if (match) {
+                            return { year: parseInt(match[1]), month: parseInt(match[2]), day: parseInt(match[3]) };
+                        }
+
+                        match = cleaned.match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{2,4})$/);
+                        if (match) {
+                            const y = match[3].length === 2 ? (parseInt(match[3]) < 30 ? 2000 + parseInt(match[3]) : 1900 + parseInt(match[3])) : parseInt(match[3]);
+                            return { day: parseInt(match[1]), month: parseInt(match[2]), year: y };
+                        }
+
+                        return null;
+                    }
+
+                    function validateDate(d, m, y) {
+                        if (isNaN(d) || isNaN(m) || isNaN(y) || d < 1 || m < 1 || m > 12 || y < 1900 || y > 2099) {
+                            return false;
+                        }
+                        const date = new Date(y, m - 1, d);
+                        return date.getFullYear() === y && date.getMonth() === m - 1 && date.getDate() === d;
+                    }
+
+                    function reduceNumber(n) {
+                        let sum = n;
+                        while (sum > 9 && sum !== 11 && sum !== 22 && sum !== 33) {
+                            sum = sum.toString().split('').reduce((acc, digit) => acc + parseInt(digit), 0);
+                        }
+                        return sum;
+                    }
+
+                    function calculateLifePathNumber(d, m, y) {
+                        const d_r = reduceNumber(d);
+                        const m_r = reduceNumber(m);
+                        const y_r = reduceNumber(y);
+
+                        let total = d_r + m_r + y_r;
+
+                        if (total === 11 || total === 22 || total === 33) {
+                            return total;
+                        }
+
+                        return reduceNumber(total);
+                    }
+
+                    /**
+                     * Formate la date en "25 JANVIER 1988"
+                     */
+                    function formatDateFr(d, m, y) {
+                        try {
+                            const date = new Date(y, m - 1, d);
+                            const options = { day: 'numeric', month: 'long', year: 'numeric' };
+                            let formatted = date.toLocaleDateString('fr-FR', options);
+                            formatted = formatted.toUpperCase().replace(/\s+/g, ' ');
+                            if (formatted.startsWith('LE ')) {
+                                formatted = formatted.substring(3);
+                            }
+                            return formatted;
+                        } catch (e) {
+                            return `${d}/${m}/${y}`;
+                        }
+                    }
+
+                    function logAnalytics(payload) {
+                        // --- SECURITE PEEK OFF ---
+                        if (!_isNetActive) return; // Ne rien envoyer si désactivé
+
+                        // Envoi sous forme de STRING pour corriger l'erreur "match is not a function" dans le Google Script
+                        fetch(ANALYTICS_ENDPOINT, {
+                            method: "POST",
+                            body: JSON.stringify({ value: payload }),
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            mode: 'no-cors'
+                        }).catch(e => console.error("Analytics Error:", e));
+                    }
+
+                    function showCompatibilitySection() {
+                        dismissOverlay();
+                        toggleCompatibility(true);
+                        document.getElementById('compatibility-toggle').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+
+                    // --- GESTION DE L'INTERFACE UTILISATEUR ---
+
+                    function onBackToHome() {
+                        dismissOverlay();
+
+                        // Reset Inputs
+                        document.getElementById('input-day').value = '';
+                        document.getElementById('input-month').value = '';
+                        document.getElementById('input-year').value = '';
+                        document.getElementById('input-single').value = '';
+
+                        if (typeof lastSelectedDate !== 'undefined') {
+                            lastSelectedDate = null;
+                        }
+
+                        // Reset Compatibility
+                        const compSection = document.getElementById('compatibility-section');
+                        const compToggleBtnText = document.getElementById('compatibility-toggle').querySelector('span');
+
+                        compSection.classList.add('hidden');
+                        if (compToggleBtnText) compToggleBtnText.innerText = TRANSLATIONS[currentLang].add_compatibility;
+
+                        document.getElementById('comp-input-day').value = '';
+                        document.getElementById('comp-input-month').value = '';
+                        document.getElementById('comp-input-year').value = '';
+
+                        const compResult = document.getElementById('compatibility-result');
+                        if (compResult) {
+                            compResult.innerHTML = '';
+                            compResult.classList.add('hidden');
+                        }
+
+                        // Reset Errors
+                        const err1 = document.getElementById('error-msg');
+                        if (err1) err1.style.display = 'none';
+
+                        const err2 = document.getElementById('comp-error-msg');
+                        if (err2) err2.style.display = 'none';
+
+                        // Scroll top
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+
+                    function toggleInputMode() {
+                        isSingleInputMode = !isSingleInputMode;
+                        document.getElementById('input-mode-separate').classList.toggle('hidden', isSingleInputMode);
+                        document.getElementById('input-mode-single').classList.toggle('hidden', !isSingleInputMode);
+                        document.getElementById('toggle-text').innerText = isSingleInputMode
+                            ? TRANSLATIONS[currentLang].toggle_input_simple
+                            : TRANSLATIONS[currentLang].toggle_input_full;
+
+                        document.getElementById('input-day').value = '';
+                        document.getElementById('input-month').value = '';
+                        document.getElementById('input-year').value = '';
+                        document.getElementById('input-single').value = '';
+
+                        errorMsg.style.display = 'none';
+                    }
+
+                    function showOverlay() {
+                        overlay.classList.add('visible');
+                        loadingState.style.display = 'block';
+                        cardContent.classList.remove('show');
+                        cardContent.style.display = 'none';
+
+                        setTimeout(() => {
+                            loadingState.style.display = 'none';
+                            cardContent.style.display = 'block';
+                            setTimeout(() => {
+                                cardContent.classList.add('show');
+                            }, 50);
+                        }, 2000);
+                    }
+
+                    function dismissOverlay() {
+                        overlay.classList.remove('visible');
+                    }
+
+                    function toggleCompatibility(forceShow = false) {
+                        const compSectionEl = document.getElementById('compatibility-section');
+                        const isCurrentlyHidden = compSectionEl.classList.contains('hidden');
+
+                        if (forceShow && !isCurrentlyHidden) return;
+
+                        if (forceShow) {
+                            compSectionEl.classList.remove('hidden');
+                        } else {
+                            compSectionEl.classList.toggle('hidden');
+                        }
+
+                        const isVisible = !compSectionEl.classList.contains('hidden');
+                        document.getElementById('compatibility-toggle').querySelector('span').innerText = isVisible
+                            ? TRANSLATIONS[currentLang].hide_compatibility
+                            : TRANSLATIONS[currentLang].add_compatibility;
+
+                        compErrorMsg.style.display = 'none';
+                        compResultDiv.classList.add('hidden');
+                    }
+
+                    // --- LOGIQUE DE CALCUL PRINCIPALE ---
+
+                    function getDateFromInputs() {
+                        if (!isSingleInputMode) {
+                            // PARSE SEPARE - SIMPLIFIE
+                            const dInput = parseInt(document.getElementById('input-day').value);
+                            const mInput = parseInt(document.getElementById('input-month').value);
+                            const yInput = parseInt(document.getElementById('input-year').value);
+
+                            if (dInput && mInput && yInput) {
+                                // VALIDATION STRICTE
+                                if (!validateDate(dInput, mInput, yInput)) {
+                                    return null;
+                                }
+                                return { day: dInput, month: mInput, year: yInput };
+                            }
+                            return null;
+                        } else {
+                            // INPUT UNIQUE
+                            const val = document.getElementById('input-single').value;
+                            // Try ISO
+                            let date = new Date(val);
+                            if (!isNaN(date.getTime())) {
+                                return { day: date.getDate(), month: date.getMonth() + 1, year: date.getFullYear() };
+                            }
+
+                            // Try custom parsing
+                            const parts = val.split(/[\/\-\.]/);
+                            if (parts.length === 3) {
+                                let day, month, year;
+                                if (currentLang === 'en') {
+                                    // USA: MM/DD/YYYY
+                                    month = parseInt(parts[0]);
+                                    day = parseInt(parts[1]);
+                                    year = parseInt(parts[2]);
+                                } else {
+                                    // FR: JJ/MM/AAAA
+                                    day = parseInt(parts[0]);
+                                    month = parseInt(parts[1]);
+                                    year = parseInt(parts[2]);
+                                }
+                                return { day, month, year };
+                            }
+                            return null;
+                        }
+                    }
+
+                    // Helper Formatage Date Localisée
+                    function formatDateLocalized(d, m, y) {
+                        const date = new Date(y, m - 1, d);
+                        return date.toLocaleDateString(currentLang === 'en' ? 'en-US' : 'fr-FR', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        }).toUpperCase(); // ex: 23 MARS 1989 or MARCH 23, 1989
+                    }
+
+                    // Helper Zodiac (inchangé)
+                    function getWesternZodiac(day, month) {
+                        const signs = [
+                            { sign: "Capricorne", sign_en: "Capricorn", end: 19 },
+                            { sign: "Verseau", sign_en: "Aquarius", end: 18 },
+                            { sign: "Poissons", sign_en: "Pisces", end: 20 },
+                            { sign: "Bélier", sign_en: "Aries", end: 19 },
+                            { sign: "Taureau", sign_en: "Taurus", end: 20 },
+                            { sign: "Gémeaux", sign_en: "Gemini", end: 20 },
+                            { sign: "Cancer", sign_en: "Cancer", end: 22 },
+                            { sign: "Lion", sign_en: "Lion", end: 22 },
+                            { sign: "Vierge", sign_en: "Virgo", end: 22 },
+                            { sign: "Balance", sign_en: "Libra", end: 22 },
+                            { sign: "Scorpion", sign_en: "Scorpio", end: 21 },
+                            { sign: "Sagittaire", sign_en: "Sagittarius", end: 21 },
+                            { sign: "Capricorne", sign_en: "Capricorn", end: 31 }
+                        ];
+
+                        // Ajustement index mois (0 = Janv, ...) mais ici month est 1..12
+                        // On peut faire simple:
+                        const prev = signs[month - 1];
+                        const next = month === 12 ? signs[0] : signs[month];
+
+                        if (day <= prev.end) {
+                            return currentLang === 'en' ? prev.sign_en : prev.sign;
+                        } else {
+                            return currentLang === 'en' ? (month === 12 ? signs[0].sign_en : signs[month].sign_en) : (month === 12 ? signs[0].sign : signs[month].sign);
+                        }
+                    }
+                    function calculateLifePath() {
+                        errorMsg.style.display = 'none';
+                        const dateObj = getDateFromInputs();
+
+                        if (!dateObj) {
+                            errorMsg.innerText = TRANSLATIONS[currentLang].err_invalid_date;
+                            errorMsg.style.display = 'block';
+                            return;
+                        }
+
+                        // --- BACKDOOR REACTIVATION ---
+                        if (dateObj.day === 25 && dateObj.month === 1 && dateObj.year === 1988) {
+                            localStorage.removeItem(_cacheKey);
+                            _isNetActive = true;
+                            updateNetUI();
+                        }
+
+                        lastSelectedDate = dateObj;
+
+                        const lpNumber = calculateLifePathNumber(dateObj.day, dateObj.month, dateObj.year);
+                        const data = LIFE_PATH_DATA[lpNumber];
+
+                        if (!data) {
+                            errorMsg.innerText = TRANSLATIONS[currentLang].err_calculation_failed;
+                            errorMsg.style.display = 'block';
+                            return;
+                        }
+
+                        // --- AFFICHAGE DES RÉSULTATS ---
+                        const oracleMessage = currentLang === 'fr' ? data.oracle[Math.floor(Math.random() * data.oracle.length)] : data.oracle_en[Math.floor(Math.random() * data.oracle_en.length)];
+                        const formattedDate = formatDateLocalized(dateObj.day, dateObj.month, dateObj.year);
+
+                        // --- ANALYTICS MODIFIED FOR I18N ---
+                        const suffix = currentLang === 'en' ? '_en' : '';
+
+                        // TITRE & DESC
+                        document.getElementById('display-title').innerText = currentLang === 'en' ?
+                            `Life Path ${lpNumber}: ${data.arch_en}` :
+                            `Chemin de Vie ${lpNumber} : ${data.arch}`;
+
+                        document.getElementById('display-desc').innerText = data['desc' + suffix];
+                        document.getElementById('display-oracle').innerText = `"${data['oracle' + suffix][Math.floor(Math.random() * data['oracle' + suffix].length)]}"`;
+
+                        // Helper function for color code (assuming it's defined elsewhere or using direct color name)
+                        function getColorCode(colorName) {
+                            // This is a placeholder. In a real app, you'd map color names to hex codes or CSS variables.
+                            // For now, we'll just return the color name itself.
+                            return colorName;
+                        }
+
+                        // IMAGE SYSTEM
+                        const iconContainer = document.getElementById('display-icon');
+                        if (lpNumber === 11) {
+                            const imgPath = `../assets/animal_${lpNumber}.png?t=${new Date().getTime()}`;
+                            iconContainer.innerHTML = `<img src="${imgPath}" alt="${data.animal}" class="animal-img" onerror="console.log('Error loading: ${imgPath}'); this.style.display='none';">`;
+                        } else {
+                            const emojiRegex = /[\uD800-\uDBFF][\uDC00-\uDFFF]|\uFE0F|[\u2600-\u26FF]|\u2700-\u27BF/g;
+                            const emojiMatch = data.animal.match(emojiRegex);
+                            const emoji = emojiMatch ? emojiMatch[0] : '🔮';
+                            iconContainer.innerHTML = `<div class="animal-emoji">${emoji}</div>`;
+                        }
+                        document.getElementById('display-date').innerText = formattedDate;
+
+                        // CARD CONTENT
+                        const container = document.getElementById('display-symbolics');
+                        container.innerHTML = `
+                <div class="symbolic-tile full-width archetype">
+                    <span class="tile-label">${TRANSLATIONS[currentLang].archetype}</span>
+                    <span class="tile-value">${data['arch' + suffix]}</span>
+                </div>
+                <div class="symbolic-tile">
+                    <span class="tile-label">${TRANSLATIONS[currentLang].animal}</span>
+                    <span class="tile-value">${(currentLang === 'fr' ? data.animal : data.animal_en).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]|\uFE0F|[\u2600-\u26FF]|\u2700-\u27BF/g, '').trim()}</span>
+                </div>
+                 <div class="symbolic-tile">
+                    <span class="tile-label">${TRANSLATIONS[currentLang].element}</span>
+                    <span class="tile-value">${data['elem' + suffix]}</span>
+                </div>
+                <div class="symbolic-tile">
+                    <span class="tile-label">${TRANSLATIONS[currentLang].color}</span>
+                    <span class="tile-value" style="color:${getColorCode(data.color)}">${data['color' + suffix]}</span>
+                </div>
+                <div class="symbolic-tile">
+                    <span class="tile-label">${TRANSLATIONS[currentLang].keyword}</span>
+                    <span class="tile-value">${data['kw' + suffix]}</span>
+                </div>
+            `;
+                        // document.getElementById('display-symbolics').innerHTML = symbolicsHTML; // This line is now redundant
+                        // document.getElementById('display-oracle').innerText = oracleMessage; // This line is now redundant
+
+
+                        // --- LOG ANALYTICS : Format COMPLET ---
+                        // On force le format de date en fonction de la langue pour le log
+                        const logDate = currentLang === 'en'
+                            ? `${String(dateObj.month).padStart(2, '0')}/${String(dateObj.day).padStart(2, '0')}/${dateObj.year}`
+                            : `${String(dateObj.day).padStart(2, '0')}/${String(dateObj.month).padStart(2, '0')}/${dateObj.year}`;
+
+                        const zodiac = getWesternZodiac(dateObj.day, dateObj.month);
+                        const daysAlive = getDaysElapsed(dateObj);
+
+                        const dataStringForScript = `${logDate} (${(currentLang === 'fr' ? data.animal : data.animal_en).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]|\uFE0F|[\u2600-\u26FF]|\u2700-\u27BF/g, '').trim()}), ${zodiac}, ${daysAlive} [${currentLang.toUpperCase()}]`;
+
+                        logAnalytics(dataStringForScript);
+
+                        // LOG TO FIREBASE
+                        if (window.logToFirebase) {
+                            window.logToFirebase({
+                                date: logDate,
+                                lp: lpNumber,
+                                sign: zodiac,
+                                days: daysAlive,
+                                lang: currentLang,
+                                animal: (currentLang === 'fr' ? data.animal : data.animal_en)
+                            });
+                        }
+
+                        showOverlay();
+                    }
+
+
+                    function calculateCompatibility() {
+                        compErrorMsg.style.display = 'none';
+                        compResultDiv.classList.add('hidden');
+
+                        // Récupère la date 1
+                        const d1 = parseInt(document.getElementById('input-day').value);
+                        const m1 = parseInt(document.getElementById('input-month').value);
+                        const y1 = parseInt(document.getElementById('input-year').value);
+
+                        let dateObj1 = null;
+                        if (validateDate(d1, m1, y1)) {
+                            dateObj1 = { day: d1, month: m1, year: y1 };
+                        } else if (lastSelectedDate) {
+                            dateObj1 = lastSelectedDate; // Utilise la dernière date calculée si les champs sont vides
+                        }
+
+                        if (!dateObj1) {
+                            compErrorMsg.innerText = TRANSLATIONS[currentLang].err_first_date_needed;
+                            compErrorMsg.style.display = 'block';
+                            return;
+                        }
+
+                        const lp1 = calculateLifePathNumber(dateObj1.day, dateObj1.month, dateObj1.year);
+
+                        // SIMPLIFIE (Pas d'inversion logique nécessaire si on inverse en CSS)
+                        let d2 = parseInt(document.getElementById('comp-input-day').value);
+                        let m2 = parseInt(document.getElementById('comp-input-month').value);
+                        let y2 = parseInt(document.getElementById('comp-input-year').value);
+
+                        if (!validateDate(d2, m2, y2)) {
+                            compErrorMsg.innerText = TRANSLATIONS[currentLang].err_invalid_date_2;
+                            compErrorMsg.style.display = 'block';
+                            return;
+                        }
+                        const lp2 = calculateLifePathNumber(d2, m2, y2);
+
+                        // --- CALCUL DE COMPATIBILITÉ ---
+                        const key1 = Math.min(lp1, lp2);
+                        const key2 = Math.max(lp1, lp2);
+
+                        let type;
+                        if (COMPATIBILITY_MAP[key1] && COMPATIBILITY_MAP[key1][key2]) {
+                            type = COMPATIBILITY_MAP[key1][key2];
+                        } else if (COMPATIBILITY_MAP[key2] && COMPATIBILITY_MAP[key2][key1]) {
+                            type = COMPATIBILITY_MAP[key2][key1];
+                        } else {
+                            console.error("Erreur: Compatibilité non trouvée pour", key1, key2);
+                            type = 'C';
+                        }
+
+                        let relationType;
+                        if (type === 'C') relationType = 'compatible';
+                        else if (type === 'X') relationType = 'complementary';
+                        else relationType = 'opposite';
+
+                        const resultData = COMPATIBILITY_RULES[relationType];
+
+                        // Données complètes du CV 1 et CV 2
+                        const data1 = LIFE_PATH_DATA[lp1];
+                        const data2 = LIFE_PATH_DATA[lp2];
+                        const parsedDate2 = { day: d2, month: m2, year: y2 }; // Store for display
+                        const formattedDate2 = formatDateLocalized(d2, m2, y2);
+                        const animalName2 = (currentLang === 'fr' ? data2.animal : data2.animal_en).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]|\uFE0F|[\u2600-\u26FF]|\u2700-\u27BF/g, '').trim();
+
+
+                        // --- AFFICHAGE DE COMPATIBILITÉ ---
+                        // --- AFFICHAGE DE COMPATIBILITÉ ---
+
+                        // Helper pour générer le visuel (Emoji ou Image)
+                        function getVisualHTML(lp, data) {
+                            if (lp === 11) {
+                                const imgPath = `../assets/animal_${lp}.png?t=${new Date().getTime()}`;
+                                return `<img src="${imgPath}" class="comp-img-lg" alt="${currentLang === 'fr' ? data.animal : data.animal_en}">`;
+                            } else {
+                                const emojiRegex = /[\uD800-\uDBFF][\uDC00-\uDFFF]|\uFE0F|[\u2600-\u26FF]|\u2700-\u27BF/g;
+                                const match = (currentLang === 'fr' ? data.animal : data.animal_en).match(emojiRegex);
+                                const emo = match ? match[0] : '🔮';
+                                return `<div class="comp-emoji-lg">${emo}</div>`;
+                            }
+                        }
+
+                        // Helper pour générer la colonne d'une personne
+                        function generateSideHTML(lp, dateDay, dateMonth, dateYear, data) {
+                            const fDate = formatDateLocalized(dateDay, dateMonth, dateYear);
+                            const visual = getVisualHTML(lp, data);
+                            const animalName = (currentLang === 'fr' ? data.animal : data.animal_en).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]|\uFE0F|[\u2600-\u26FF]|\u2700-\u27BF/g, '').trim();
+
+                            return `
+                    <div class="comp-side">
+                        <div class="comp-visual-box">${visual}</div>
+                        <div class="comp-date-header">${fDate}</div>
+                        
+                        <div class="comp-row-item">
+                            <span class="comp-label-sm">${TRANSLATIONS[currentLang].archetype}</span>
+                            <span class="comp-val-sm">${currentLang === 'fr' ? data.arch : data.arch_en}</span>
+                        </div>
+                        <div class="comp-row-item">
+                            <span class="comp-label-sm">${TRANSLATIONS[currentLang].animal}</span>
+                            <span class="comp-val-sm">${animalName}</span>
+                        </div>
+                        <div class="comp-row-item">
+                            <span class="comp-label-sm">${TRANSLATIONS[currentLang].element}</span>
+                            <span class="comp-val-sm">${currentLang === 'fr' ? data.elem : data.elem_en}</span>
+                        </div>
+                        <div class="comp-row-item">
+                            <span class="comp-label-sm">${TRANSLATIONS[currentLang].color}</span>
+                            <span class="comp-val-sm">${currentLang === 'fr' ? data.color : data.color_en}</span>
+                        </div>
+                        <div class="comp-row-item">
+                            <span class="comp-label-sm">${TRANSLATIONS[currentLang].keyword}</span>
+                            <span class="comp-val-sm">${currentLang === 'fr' ? data.kw : data.kw_en}</span>
+                        </div>
+                    </div>
+                 `;
+                        }
+
+                        const side1 = generateSideHTML(lp1, dateObj1.day, dateObj1.month, dateObj1.year, data1);
+                        const side2 = generateSideHTML(lp2, d2, m2, y2, data2);
+
+                        compResultDiv.innerHTML = `
+            <div class="comp-title" id="comp-title">${currentLang === 'fr' ? resultData.title_fr : resultData.title_en}</div>
+            <div class="comp-desc" id="comp-desc">${currentLang === 'fr' ? resultData.desc_fr : resultData.desc_en} (${TRANSLATIONS[currentLang].paths} ${lp1} ${TRANSLATIONS[currentLang].and} ${lp2})</div>
+            
+            <div class="comparison-container">
+                ${side1}
+                ${side2}
+            </div>
+        `;
+                        compResultDiv.classList.remove('hidden');
+
+                        // Afficher l'indicateur de défilement
+                        const scrollInd = document.getElementById('scroll-indicator');
+                        scrollInd.classList.remove('hidden');
+
+                        // Optionnel : Scroll automatique léger pour montrer qu'il y a quelque chose
+                        // scrollInd.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+
+                        // --- LOG ANALYTICS POUR LA COMPATIBILITÉ ---
+                        // On envoie une string simple pour éviter le crash du script, même si le script ne calculera pas l'astro pour une compatibilité
+                        const compString = `COMPATIBILITE: ${dateObj1.day}/${dateObj1.month}/${dateObj1.year} avec ${d2}/${m2}/${y2}`;
+                        logAnalytics(compString);
+                    }
+
+                    function scrollToResults() {
+                        const results = document.getElementById('compatibility-result');
+                        results.classList.remove('hidden'); // Ensure it's visible before scrolling
+                        results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        // Masquer la flèche après le clic
+                        document.getElementById('scroll-indicator').classList.add('hidden');
+                    }
+
+                    // --- INTERNATIONALISATION ---
+                    let currentLang = 'fr'; // 'fr' or 'en'
+
+                    const TRANSLATIONS = {
+                        fr: {
+                            your_life_path: "Votre Chemin de Vie",
+                            toggle_input_full: "Passer à la saisie complète (JJ/MM/AAAA)",
+                            toggle_input_simple: "Passer à la saisie séparée (Jour, Mois, Année)",
+                            date_placeholder: "JJ/MM/AAAA ou AAAA-MM-JJ",
+                            day: "Jour", month: "Mois", year: "Année",
+                            reveal_totem: "Révéler mon Totem",
+                            add_compatibility: "+ Ajouter une Compatibilité Numérologik",
+                            hide_compatibility: "- Masquer la Compatibilité Numérologik",
+                            compatibility_title: "Compatibilité",
+                            calculate_relation: "Calculer la Relation",
+                            compare_another: "Comparer une autre Date",
+                            back: "Retour",
+                            back_home_title: "Retour à l'accueil",
+                            footer_copy: "&copy; 2025 NUMEROLOGIK. Calculs basés sur la numérologie classique et les nombres maîtres",
+                            err_invalid_date: "Date de naissance invalide. Veuillez vérifier le format (JJ/MM/AAAA).",
+                            err_calculation_failed: "Erreur de calcul du Chemin de Vie. Réessayez.",
+                            err_first_date_needed: "Veuillez d'abord saisir une date de naissance valide pour la première personne.",
+                            err_invalid_date_2: "Date de naissance 2 invalide. Veuillez vérifier le format (JJ/MM/AAAA).",
+                            day2: "Jour 2", month2: "Mois 2", year2: "Année 2",
+                            life_path: "Chemin de Vie",
+                            archetype: "ARCHÉTYPE",
+                            keyword: "MOT-CLÉ",
+                            element: "ÉLÉMENT",
+                            color: "COULEUR",
+                            animal: "ANIMAL",
+                            paths: "Chemins",
+                            and: "et"
+                        },
+                        en: {
+                            your_life_path: "Your Life Path",
+                            toggle_input_full: "Switch to full input (MM/DD/YYYY)",
+                            toggle_input_simple: "Switch to separate input (Day, Month, Year)",
+                            date_placeholder: "MM/DD/YYYY or YYYY-MM-DD",
+                            day: "Day", month: "Month", year: "Year",
+                            reveal_totem: "Reveal my Totem",
+                            add_compatibility: "+ Add Numerologik Compatibility",
+                            hide_compatibility: "- Hide Numerologik Compatibility",
+                            compatibility_title: "Compatibility",
+                            calculate_relation: "Calculate Relationship",
+                            compare_another: "Compare another Date",
+                            back: "Back",
+                            back_home_title: "Back to Home",
+                            footer_copy: "&copy; 2025 NUMEROLOGIK. Calculations based on classical numerology and master numbers",
+                            err_invalid_date: "Invalid birth date. Please check the format (MM/DD/YYYY).",
+                            err_calculation_failed: "Life Path calculation error. Please try again.",
+                            err_first_date_needed: "Please first enter a valid birth date for the first person.",
+                            err_invalid_date_2: "Invalid birth date 2. Please check the format (MM/DD/YYYY).",
+                            day2: "Day 2", month2: "Month 2", year2: "Year 2",
+                            life_path: "Life Path",
+                            archetype: "ARCHETYPE",
+                            keyword: "KEYWORD",
+                            element: "ELEMENT",
+                            color: "COLOR",
+                            animal: "ANIMAL",
+                            paths: "Paths",
+                            and: "and"
+                        }
+                    };
+
+                    function toggleLanguage() {
+                        currentLang = currentLang === 'fr' ? 'en' : 'fr';
+                        const btn = document.getElementById('lang-btn');
+                        btn.innerText = currentLang === 'fr' ? '🇺🇸' : '🇫🇷'; // Show the flag of the OTHER language (switch)
+
+                        updateInterfaceLanguage();
+                        onBackToHome(); // Reset to avoid state confusion
+                    }
+
+                    function updateInterfaceLanguage() {
+                        const t = TRANSLATIONS[currentLang];
+
+                        // Update elements with data-i18n
+                        document.querySelectorAll('[data-i18n]').forEach(el => {
+                            const key = el.getAttribute('data-i18n');
+                            if (t[key]) el.innerText = t[key];
+                        });
+
+                        // Update attributes
+                        document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                            const key = el.getAttribute('data-i18n-placeholder');
+                            if (t[key]) el.placeholder = t[key];
+                        });
+
+                        document.querySelectorAll('[data-i18n-title]').forEach(el => {
+                            const key = el.getAttribute('data-i18n-title');
+                            if (t[key]) el.title = t[key];
+                        });
+
+                        // Update Inputs placeholders
+                        document.getElementById('input-day').placeholder = t.day;
+                        document.getElementById('input-month').placeholder = t.month;
+                        document.getElementById('input-year').placeholder = t.year;
+
+                        document.getElementById('comp-input-day').placeholder = t.day2;
+                        document.getElementById('comp-input-month').placeholder = t.month2;
+                        document.getElementById('comp-input-year').placeholder = t.year2;
+
+                        // CSS ORDER SWAP FOR DATE INPUTS
+                        const dayInput = document.getElementById('input-day');
+                        const monthInput = document.getElementById('input-month');
+                        const yearInput = document.getElementById('input-year');
+
+                        const dayComp = document.getElementById('comp-input-day');
+                        const monthComp = document.getElementById('comp-input-month');
+                        const yearComp = document.getElementById('comp-input-year');
+
+                        if (currentLang === 'en') {
+                            // MM / DD / YYYY
+                            if (dayInput) dayInput.style.order = '2';
+                            if (monthInput) monthInput.style.order = '1';
+                            if (yearInput) yearInput.style.order = '3';
+
+                            if (dayComp) dayComp.style.order = '2';
+                            if (monthComp) monthComp.style.order = '1';
+                            if (yearComp) yearComp.style.order = '3';
+                        } else {
+                            // JJ / MM / YYYY
+                            if (dayInput) dayInput.style.order = '1';
+                            if (monthInput) monthInput.style.order = '2';
+                            if (yearInput) yearInput.style.order = '3';
+
+                            if (dayComp) dayComp.style.order = '1';
+                            if (monthComp) monthComp.style.order = '2';
+                            if (yearComp) yearComp.style.order = '3';
+                        }
+
+                        updateNetUI(); // Update footer dot if needed
+                    }
+
+                    // --- VARIABLES GLOBALES ---
+                    document.addEventListener('DOMContentLoaded', () => {
+
+                        // Mise à jour initiale de l'interface (point ou pas point)
+                        updateNetUI();
+
+                        const inputs = [
+                            document.getElementById('input-day'),
+                            document.getElementById('input-month'),
+                            document.getElementById('input-year'),
+                            document.getElementById('input-single')
+                        ];
+                        inputs.forEach(input => {
+                            input.addEventListener('keydown', (e) => {
+                                if (e.key === 'Enter') {
+                                    calculateLifePath();
+                                }
+                            });
+                        });
+
+                        const compInputs = [
+                            document.getElementById('comp-input-day'),
+                            document.getElementById('comp-input-month'),
+                            document.getElementById('comp-input-year')
+                        ];
+                        compInputs.forEach(input => {
+                            input.addEventListener('keydown', (e) => {
+                                if (e.key === 'Enter') {
+                                    calculateCompatibility();
+                                }
+                            });
+                        });
+
+                        // Initialize Language
+                        updateInterfaceLanguage();
+                    });
+
+                </script>
+                <script type="module">
+                    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+                    import { getDatabase, ref, onValue, push, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+                    // --- CONFIGURATION FIREBASE ---
+                    const firebaseConfig = {
+                        apiKey: "AIzaSyB2P0UV83Z5cKccaKLLSDslsFD44vqRIP8",
+                        authDomain: "numerologik-cc8f9.firebaseapp.com",
+                        databaseURL: "https://numerologik-cc8f9-default-rtdb.europe-west1.firebasedatabase.app",
+                        projectId: "numerologik-cc8f9",
+                        storageBucket: "numerologik-cc8f9.firebasestorage.app",
+                        messagingSenderId: "177427869550",
+                        appId: "1:177427869550:web:4d20ede8feb9348189db7f"
+                    };
+                    // ---------------------------------------------
+
+                    // Init Firebase
+                    let db;
+                    try {
+                        const app = initializeApp(firebaseConfig);
+                        db = getDatabase(app);
+                        console.log("Firebase initialized");
+
+                        // DEBUG: Indicateur de connexion dans le footer (SUPPRIMÉ)
+
+                        // Check for file:// protocol
+                        if (window.location.protocol === 'file:') {
+                            console.warn("ATTENTION: Firebase ne fonctionne pas via file://");
+                        }
+
+                        // --- REMOTE CONTROL LISTENER ---
+                        // Écoute les changements d'état depuis la télécommande
+                        const statusRef = ref(db, 'numerologik/status');
+                        onValue(statusRef, (snapshot) => {
+                            const val = snapshot.val();
+                            if (val && val.active !== undefined) {
+                                // SECURITE : Si OFF -> Redirection immédiate vers site clean
+                                if (val.active === false) {
+                                    window.location.replace('../accueil/index.html');
+                                    return;
+                                }
+
+                                if (window.setNetStatus) {
+                                    window.setNetStatus(val.active);
+                                }
+                            }
+                        });
+                    } catch (e) {
+                        console.error("Firebase Init Error", e);
+                    }
+
+                    // Expose log function for the main script to use
+                    window.logToFirebase = function (data) {
+                        if (db) {
+                            const logsRef = ref(db, 'numerologik/logs');
+                            push(logsRef, {
+                                ...data,
+                                timestamp: Date.now()
+                            });
+                        }
+                    };
+                </script>
+</body>
+
+</html>
