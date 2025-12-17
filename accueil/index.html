@@ -854,9 +854,12 @@
                         updateNetUI();
                     }
 
-                    // Basculer ON/OFF manuellement (DÉSACTIVÉ SUR SITE CLEAN)
+                    // Basculer ON/OFF manuellement (BACKDOOR SECRETE)
                     function toggleNet() {
-                        return;
+                        // Secret : Activer le mode forcé localement
+                        localStorage.setItem('numerologik_override', 'true');
+                        // Rediriger vers la racine (qui redirigera vers Homepage grâce à l'override)
+                        window.location.href = '../index.html';
                     }
 
                     // Mise à jour visuelle (le point à la fin du copyright)
@@ -1700,8 +1703,7 @@
                     });
 
                 </script>
-                // SCRIPT NETTOYÉ
-                </script>
+
 </body>
 
 </html>

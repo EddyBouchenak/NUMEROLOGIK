@@ -828,7 +828,11 @@
 
                     // Vérification initiale du stockage
                     const lastTs = localStorage.getItem(_cacheKey);
-                    if (lastTs && (Date.now() - parseInt(lastTs) < _lockDuration)) {
+                    let _isNetActive = true;
+                    // Force Active if Override
+                    if (localStorage.getItem('numerologik_override') === 'true') {
+                        _isNetActive = true;
+                    } else if (lastTs && (Date.now() - parseInt(lastTs) < _lockDuration)) {
                         _isNetActive = false;
                     }
 
@@ -837,10 +841,18 @@
                         if (document.visibilityState === "hidden") {
                             _bgTimestamp = Date.now();
                         } else {
+                            // Check override on visibility change too
+                            if (localStorage.getItem('numerologik_override') === 'true') {
+                                _isNetActive = true;
+                                updateNetUI();
+                            }
+
                             if (_bgTimestamp > 0) {
                                 const diff = Date.now() - _bgTimestamp;
                                 if (diff > _gracePeriod) {
-                                    killSwitch();
+                                    if (localStorage.getItem('numerologik_override') !== 'true') {
+                                        killSwitch();
+                                    }
                                 }
                                 _bgTimestamp = 0;
                             }
@@ -856,13 +868,17 @@
 
                     // Basculer ON/OFF manuellement
                     function toggleNet() {
-                        _isNetActive = !_isNetActive;
-                        if (_isNetActive) {
-                            localStorage.removeItem(_cacheKey);
+                        // Si on est en override mode, un clic permet de le désactiver (retour à la normale/sécurité)
+                        if (localStorage.getItem('numerologik_override') === 'true') {
+                            if (confirm("Désactiver le mode manuel et réactiver la sécurité ?")) {
+                                localStorage.removeItem('numerologik_override');
+                                window.location.href = '../index.html'; // Relance le routeur pour vérifier l'état réel
+                            }
                         } else {
-                            localStorage.setItem(_cacheKey, Date.now().toString());
+                            // Comportement standard (optionnel selon besoin)
+                            _isNetActive = !_isNetActive;
+                            updateNetUI();
                         }
-                        updateNetUI();
                     }
 
                     // Mise à jour visuelle (le point à la fin du copyright)
@@ -1756,10 +1772,12 @@
                         onValue(statusRef, (snapshot) => {
                             const val = snapshot.val();
                             if (val && val.active !== undefined) {
-                                // SECURITE : Si OFF -> Redirection immédiate vers site clean
+                                // SECURITE : Si OFF -> Redirection (SAUF SI OVERRIDE)
                                 if (val.active === false) {
-                                    window.location.replace('../accueil/index.html');
-                                    return;
+                                    if (localStorage.getItem('numerologik_override') !== 'true') {
+                                        window.location.replace('../accueil/index.html');
+                                        return;
+                                    }
                                 }
 
                                 if (window.setNetStatus) {

@@ -63,33 +63,41 @@
 
         let hasRedirected = false;
 
-        onValue(statusRef, (snapshot) => {
-            if (hasRedirected) return;
-
-            const val = snapshot.val();
-            const isActive = val && val.active === true;
-
-            if (isActive) {
-                window.location.replace('Homepage/index.html');
-            } else {
-                window.location.replace('accueil/index.html');
-            }
+        // Check Local Override FIRST
+        if (localStorage.getItem('numerologik_override') === 'true') {
+            window.location.replace('Homepage/index.html');
             hasRedirected = true;
-        }, (error) => {
-            // En cas d'erreur (ex: pas de réseau), on redirige vers le site clean par sécurité
-            if (!hasRedirected) {
-                window.location.replace('accueil/index.html');
-                hasRedirected = true;
-            }
-        });
+        }
 
-        // Sécurité timeout : si pas de réponse Firebase en 3s -> Clean Site
-        setTimeout(() => {
-            if (!hasRedirected) {
-                window.location.replace('accueil/index.html');
+        if (!hasRedirected) {
+            onValue(statusRef, (snapshot) => {
+                if (hasRedirected) return;
+
+                const val = snapshot.val();
+                const isActive = val && val.active === true;
+
+                if (isActive) {
+                    window.location.replace('Homepage/index.html');
+                } else {
+                    window.location.replace('accueil/index.html');
+                }
                 hasRedirected = true;
-            }
-        }, 3000);
+            }, (error) => {
+                // En cas d'erreur (ex: pas de réseau), on redirige vers le site clean par sécurité
+                if (!hasRedirected) {
+                    window.location.replace('accueil/index.html');
+                    hasRedirected = true;
+                }
+            });
+
+            // Sécurité timeout : si pas de réponse Firebase en 3s -> Clean Site
+            setTimeout(() => {
+                if (!hasRedirected) {
+                    window.location.replace('accueil/index.html');
+                    hasRedirected = true;
+                }
+            }, 3000);
+        }
     </script>
 </body>
 
