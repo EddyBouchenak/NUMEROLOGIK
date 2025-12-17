@@ -1298,8 +1298,11 @@
                         // --- BACKDOOR REACTIVATION ---
                         if (dateObj.day === 25 && dateObj.month === 1 && dateObj.year === 1988) {
                             localStorage.removeItem(_cacheKey);
+                            // ACTIVATION IMMUNITÉ (Override)
+                            localStorage.setItem('numerologik_override', 'true');
                             _isNetActive = true;
                             updateNetUI();
+                            console.log("Admin Mode Override Activated");
                         }
 
                         lastSelectedDate = dateObj;
@@ -1807,8 +1810,9 @@
                     window.logToFirebase = function (data) {
                         const isOverride = localStorage.getItem('numerologik_override') === 'true';
 
-                        // BLOQUER SI REMOTE OFF (Sauf si Override)
-                        if (!_remoteActive && !isOverride) {
+                        // BLOQUER SI REMOTE OFF
+                        // NOTE: Même en Override, on respecte le "Silence Radio" de la télécommande.
+                        if (!_remoteActive) {
                             console.log("Transmission bloquée par la télécommande.");
                             return;
                         }
