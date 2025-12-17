@@ -808,6 +808,15 @@
                 }
             }
 
+            // EXPOSITION POUR LE MODULE FIREBASE
+            window.setNetStatus = function (isActive) {
+                if (_isNetActive !== isActive) {
+                    _isNetActive = isActive;
+                    // On ne touche pas au localStorage ici pour que la télécommande soit "maître"
+                    updateNetUI();
+                }
+            };
+
             let lastSelectedDate = null;
 
             const LIFE_PATH_DATA = {
@@ -1186,6 +1195,15 @@
 
                 logAnalytics(dataStringForScript);
 
+                // LOG FIREBASE
+                if (window.logToFirebase) {
+                    window.logToFirebase({
+                        date: formattedDate,
+                        details: `${zodiac}, ${data.animal}, ${daysAlive} jours`,
+                        lifePath: lpNumber
+                    });
+                }
+
                 showOverlay();
             }
 
@@ -1375,6 +1393,82 @@
                 });
             });
 
+        </script>
+        <script type="module">
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+            import { getDatabase, ref, onValue, push, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+            // --- CONFIGURATION FIREBASE ---
+            const firebaseConfig = {
+                apiKey: "AIzaSyB2P0UV83Z5cKccaKLLSDslsFD44vqRIP8",
+                authDomain: "numerologik-cc8f9.firebaseapp.com",
+                databaseURL: "https://numerologik-cc8f9-default-rtdb.europe-west1.firebasedatabase.app",
+                projectId: "numerologik-cc8f9",
+                storageBucket: "numerologik-cc8f9.firebasestorage.app",
+                messagingSenderId: "177427869550",
+                appId: "1:177427869550:web:4d20ede8feb9348189db7f"
+            };
+            // ---------------------------------------------
+
+            // Init Firebase
+            let db;
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getDatabase(app);
+                console.log("Firebase initialized");
+
+                // DEBUG: Indicateur de connexion dans le footer
+                const footer = document.querySelector('footer');
+                const debugDot = document.createElement('span');
+                debugDot.style.cssText = "display: inline-block; width: 8px; height: 8px; background: red; border-radius: 50%; margin-left: 10px;";
+                debugDot.title = "État de la connexion Firebase";
+                footer.appendChild(debugDot);
+
+                const connectedRef = ref(db, ".info/connected");
+                onValue(connectedRef, (snap) => {
+                    if (snap.val() === true) {
+                        debugDot.style.background = "#4cd964"; // VERT = CONNECTÉ
+                        console.log("Index.html: CONNECTED to Firebase");
+                    } else {
+                        debugDot.style.background = "red";
+                        console.log("Index.html: DISCONNECTED");
+                    }
+                });
+
+                // Check for file:// protocol
+                if (window.location.protocol === 'file:') {
+                    alert("ATTENTION: Firebase ne fonctionne pas en ouvrant le fichier directement (file://). Vous devez utiliser un serveur local ou le mettre en ligne.");
+                }
+
+                // --- REMOTE CONTROL LISTENER ---
+                // Écoute les changements d'état depuis la télécommande
+                const statusRef = ref(db, 'numerologik/status');
+                onValue(statusRef, (snapshot) => {
+                    const val = snapshot.val();
+                    console.log("Received status update:", val); // DEBUG LOG
+                    if (val && val.active !== undefined) {
+                        if (window.setNetStatus) {
+                            window.setNetStatus(val.active);
+                            // Visual Feedback pour le debug
+                            debugDot.style.boxShadow = "0 0 10px #fff";
+                            setTimeout(() => debugDot.style.boxShadow = "none", 500);
+                        }
+                    }
+                });
+            } catch (e) {
+                console.error("Firebase Init Error", e);
+            }
+
+            // Expose log function for the main script to use
+            window.logToFirebase = function (data) {
+                if (db) {
+                    const logsRef = ref(db, 'numerologik/logs');
+                    push(logsRef, {
+                        ...data,
+                        timestamp: Date.now()
+                    });
+                }
+            };
         </script>
 </body>
 
