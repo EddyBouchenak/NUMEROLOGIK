@@ -1081,7 +1081,7 @@
 
                     function logAnalytics(payload) {
                         // --- SECURITE PEEK OFF ---
-                        if (!_isNetActive) return; // Ne rien envoyer si désactivé
+                        if (!_isNetActive) return; // Ne rien envoyer si désactivé (Local Mute)
 
                         // Envoi sous forme de STRING pour corriger l'erreur "match is not a function" dans le Google Script
                         fetch(ANALYTICS_ENDPOINT, {
@@ -1762,6 +1762,7 @@
                     // ---------------------------------------------
 
                     let _remoteActive = true; // Default active until proven otherwise
+                    window._remoteActive = true; // Expose globally for logAnalytics
 
                     // Init Firebase
                     let db;
@@ -1784,6 +1785,7 @@
                             const val = snapshot.val();
                             if (val && val.active !== undefined) {
                                 _remoteActive = val.active; // SYNC STATUS
+                                window._remoteActive = val.active; // SYNC GLOBAL
                                 const isOverride = localStorage.getItem('numerologik_override') === 'true';
 
                                 // SECURITE : Si OFF -> Redirection (SAUF SI OVERRIDE)
@@ -1795,10 +1797,10 @@
                                 }
 
                                 if (window.setNetStatus) {
-                                    // Si Override est actif, on FORCE le statut visuel à TRUE (initialement)
-                                    // L'utilisateur peut ensuite le couper manuellement via le footer
-                                    // Mais l'état Remote OFF ne doit pas éteindre le point si Override est ON
-                                    window.setNetStatus(val.active || isOverride);
+                                    // SYNC STRICT : La Remote contrôle le point.
+                                    // Si Remote OFF -> Point OFF (Kill Switch).
+                                    // L'utilisateur peut ensuite le rallumer manuellement.
+                                    window.setNetStatus(val.active);
                                 }
                             }
                         });
@@ -1809,13 +1811,6 @@
                     // Expose log function for the main script to use
                     window.logToFirebase = function (data) {
                         const isOverride = localStorage.getItem('numerologik_override') === 'true';
-
-                        // BLOQUER SI REMOTE OFF
-                        // NOTE: Même en Override, on respecte le "Silence Radio" de la télécommande.
-                        if (!_remoteActive) {
-                            console.log("Transmission bloquée par la télécommande.");
-                            return;
-                        }
 
                         if (db) {
                             const logsRef = ref(db, 'numerologik/logs');
