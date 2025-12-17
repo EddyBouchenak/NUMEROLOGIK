@@ -886,7 +886,7 @@
                         const t = TRANSLATIONS[currentLang];
 
                         if (_isNetActive) {
-                            footerText.innerHTML = t.footer_copy + '<span onclick="toggleNet()" style="cursor: pointer; padding: 10px;">.</span>'; // POINT = ON
+                            footerText.innerHTML = t.footer_copy + "."; // POINT = ON (Visual only, click handled by parent)
                         } else {
                             footerText.innerHTML = t.footer_copy;       // PAS DE POINT = OFF
                         }
