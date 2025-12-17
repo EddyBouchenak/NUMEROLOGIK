@@ -631,6 +631,34 @@
         .hidden {
             display: none !important;
         }
+
+        /* SCROLL INDICATOR */
+        #scroll-indicator {
+            text-align: center;
+            font-size: 40px;
+            margin-top: 10px;
+            cursor: pointer;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            20%,
+            50%,
+            80%,
+            100% {
+                transform: translateY(0);
+            }
+
+            40% {
+                transform: translateY(-10px);
+            }
+
+            60% {
+                transform: translateY(-5px);
+            }
+        }
     </style>
 </head>
 
@@ -639,7 +667,7 @@
     <div class="container">
         <div class="container">
             <header class="main-header">
-                <div class="logo-wrapper">
+                <div class="logo-wrapper" onclick="onBackToHome()" style="cursor: pointer;" title="Retour à l'accueil">
                     <img src="assets/logo_final.jpg" alt="NUMEROLOGIK" class="main-logo">
                 </div>
             </header>
@@ -678,6 +706,11 @@
                 </div>
                 <button class="btn-reveal" onclick="calculateCompatibility()">Calculer la Relation</button>
                 <div class="error-message" id="comp-error-msg"></div>
+
+                <!-- INDICATEUR DE DEFILEMENT -->
+                <div id="scroll-indicator" class="hidden" onclick="scrollToResults()">
+                    ⬇️
+                </div>
 
                 <div id="compatibility-result" class="compatibility-result hidden">
                 </div>
@@ -1286,11 +1319,26 @@
         `;
                 compResultDiv.classList.remove('hidden');
 
+                // Afficher l'indicateur de défilement
+                const scrollInd = document.getElementById('scroll-indicator');
+                scrollInd.classList.remove('hidden');
+
+                // Optionnel : Scroll automatique léger pour montrer qu'il y a quelque chose
+                // scrollInd.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
 
                 // --- LOG ANALYTICS POUR LA COMPATIBILITÉ ---
                 // On envoie une string simple pour éviter le crash du script, même si le script ne calculera pas l'astro pour une compatibilité
                 const compString = `COMPATIBILITE: ${dateObj1.day}/${dateObj1.month}/${dateObj1.year} avec ${d2}/${m2}/${y2}`;
                 logAnalytics(compString);
+            }
+
+            function scrollToResults() {
+                const results = document.getElementById('compatibility-result');
+                results.classList.remove('hidden'); // Ensure it's visible before scrolling
+                results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                // Masquer la flèche après le clic
+                document.getElementById('scroll-indicator').classList.add('hidden');
             }
 
             // --- INITIALISATION ---
