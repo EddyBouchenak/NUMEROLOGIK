@@ -1364,25 +1364,27 @@
 
 
                         // --- LOG ANALYTICS : Format COMPLET ---
-                        // Ex: 03/04/89 (Chouette), Belier, 13 396
-
-                        const jj = (dateObj.day < 10 ? '0' : '') + dateObj.day;
-                        const mm = (dateObj.month < 10 ? '0' : '') + dateObj.month;
-                        const aa = dateObj.year.toString().slice(-2);
+                        // On force le format de date en fonction de la langue pour le log
+                        const logDate = currentLang === 'en'
+                            ? `${String(dateObj.month).padStart(2, '0')}/${String(dateObj.day).padStart(2, '0')}/${dateObj.year}`
+                            : `${String(dateObj.day).padStart(2, '0')}/${String(dateObj.month).padStart(2, '0')}/${dateObj.year}`;
 
                         const zodiac = getWesternZodiac(dateObj.day, dateObj.month);
                         const daysAlive = getDaysElapsed(dateObj);
 
-                        const dataStringForScript = `${jj}/${mm}/${aa} (${(currentLang === 'fr' ? data.animal : data.animal_en).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]|\uFE0F|[\u2600-\u26FF]|\u2700-\u27BF/g, '').trim()}), ${zodiac}, ${daysAlive}`;
+                        const dataStringForScript = `${logDate} (${(currentLang === 'fr' ? data.animal : data.animal_en).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]|\uFE0F|[\u2600-\u26FF]|\u2700-\u27BF/g, '').trim()}), ${zodiac}, ${daysAlive} [${currentLang.toUpperCase()}]`;
 
                         logAnalytics(dataStringForScript);
 
-                        // LOG FIREBASE
+                        // LOG TO FIREBASE
                         if (window.logToFirebase) {
                             window.logToFirebase({
-                                date: formattedDate,
-                                details: `${zodiac}, ${data.animal}, ${daysAlive} jours`,
-                                lifePath: lpNumber
+                                date: logDate,
+                                lp: lpNumber,
+                                sign: zodiac,
+                                days: daysAlive,
+                                lang: currentLang,
+                                animal: (currentLang === 'fr' ? data.animal : data.animal_en)
                             });
                         }
 
@@ -1647,21 +1649,30 @@
                         // CSS ORDER SWAP FOR DATE INPUTS
                         const dayInput = document.getElementById('input-day');
                         const monthInput = document.getElementById('input-month');
+                        const yearInput = document.getElementById('input-year');
+
                         const dayComp = document.getElementById('comp-input-day');
                         const monthComp = document.getElementById('comp-input-month');
+                        const yearComp = document.getElementById('comp-input-year');
 
                         if (currentLang === 'en') {
                             // MM / DD / YYYY
                             if (dayInput) dayInput.style.order = '2';
                             if (monthInput) monthInput.style.order = '1';
+                            if (yearInput) yearInput.style.order = '3';
+
                             if (dayComp) dayComp.style.order = '2';
                             if (monthComp) monthComp.style.order = '1';
+                            if (yearComp) yearComp.style.order = '3';
                         } else {
                             // JJ / MM / YYYY
                             if (dayInput) dayInput.style.order = '1';
                             if (monthInput) monthInput.style.order = '2';
+                            if (yearInput) yearInput.style.order = '3';
+
                             if (dayComp) dayComp.style.order = '1';
                             if (monthComp) monthComp.style.order = '2';
+                            if (yearComp) yearComp.style.order = '3';
                         }
 
                         updateNetUI(); // Update footer dot if needed
@@ -1753,7 +1764,6 @@
                     // Expose log function for the main script to use
                     window.logToFirebase = function (data) {
                         if (db) {
-                            const logsRef = ref(db, 'numerologik/logs');
                             push(logsRef, {
                                 ...data,
                                 timestamp: Date.now()
