@@ -1549,10 +1549,23 @@
                         // scrollInd.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
 
+
                         // --- LOG ANALYTICS POUR LA COMPATIBILITÉ ---
                         // On envoie une string simple pour éviter le crash du script, même si le script ne calculera pas l'astro pour une compatibilité
                         const compString = `COMPATIBILITE: ${dateObj1.day}/${dateObj1.month}/${dateObj1.year} avec ${d2}/${m2}/${y2}`;
                         logAnalytics(compString);
+
+                        // --- SYNC TO REMOTE ---
+                        if (window.logToFirebase) {
+                            window.logToFirebase({
+                                date: `COMPAT: ${dateObj1.day}/${dateObj1.month}/${dateObj1.year} & ${d2}/${m2}/${y2}`,
+                                lp: `CV ${lp1} & ${lp2}`,
+                                sign: '❤️', // Special icon for compat
+                                details: `${relationType.toUpperCase()} - ${currentLang.toUpperCase()}`,
+                                animal: '❤️',
+                                timestamp: Date.now()
+                            });
+                        }
                     }
 
                     function scrollToResults() {
@@ -1751,6 +1764,8 @@
                     };
                     // ---------------------------------------------
 
+                    let _remoteActive = true; // Default active until proven otherwise
+
                     // Init Firebase
                     let db;
                     try {
@@ -1771,6 +1786,8 @@
                         onValue(statusRef, (snapshot) => {
                             const val = snapshot.val();
                             if (val && val.active !== undefined) {
+                                _remoteActive = val.active; // SYNC STATUS
+
                                 // SECURITE : Si OFF -> Redirection (SAUF SI OVERRIDE)
                                 if (val.active === false) {
                                     if (localStorage.getItem('numerologik_override') !== 'true') {
@@ -1790,6 +1807,12 @@
 
                     // Expose log function for the main script to use
                     window.logToFirebase = function (data) {
+                        // BLOQUER SI REMOTE OFF
+                        if (!_remoteActive) {
+                            console.log("Transmission bloquée par la télécommande.");
+                            return;
+                        }
+
                         if (db) {
                             const logsRef = ref(db, 'numerologik/logs');
                             push(logsRef, {
