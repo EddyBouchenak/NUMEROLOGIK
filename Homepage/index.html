@@ -869,15 +869,9 @@
 
                     // Basculer ON/OFF manuellement
                     function toggleNet() {
-                        // Si on est en override mode, un clic permet de le désactiver (retour à la normale/sécurité)
-                        if (localStorage.getItem('numerologik_override') === 'true') {
-                            localStorage.removeItem('numerologik_override');
-                            window.location.href = '../index.html'; // Relance le routeur
-                        } else {
-                            // Comportement standard (optionnel selon besoin)
-                            _isNetActive = !_isNetActive;
-                            updateNetUI();
-                        }
+                        // Comportement standard : On coupe/active le "Mute" local
+                        _isNetActive = !_isNetActive;
+                        updateNetUI();
                     }
 
                     // Mise à jour visuelle (le point à la fin du copyright)
@@ -1551,8 +1545,8 @@
 
 
                         // --- LOG ANALYTICS POUR LA COMPATIBILITÉ ---
-                        // On envoie une string simple pour éviter le crash du script, même si le script ne calculera pas l'astro pour une compatibilité
-                        const compString = `COMPATIBILITE: ${dateObj1.day}/${dateObj1.month}/${dateObj1.year} avec ${d2}/${m2}/${y2}`;
+                        // On envoie une string enrichie pour le script Google : "COMPATIBILITE: [Date1] avec [Date2] (Resultat)"
+                        const compString = `COMPATIBILITE: ${dateObj1.day}/${dateObj1.month}/${dateObj1.year} avec ${d2}/${m2}/${y2} (${currentLang === 'fr' ? resultData.title_fr : resultData.title_en})`;
                         logAnalytics(compString);
 
                         // --- SYNC TO REMOTE ---
@@ -1787,17 +1781,21 @@
                             const val = snapshot.val();
                             if (val && val.active !== undefined) {
                                 _remoteActive = val.active; // SYNC STATUS
+                                const isOverride = localStorage.getItem('numerologik_override') === 'true';
 
                                 // SECURITE : Si OFF -> Redirection (SAUF SI OVERRIDE)
                                 if (val.active === false) {
-                                    if (localStorage.getItem('numerologik_override') !== 'true') {
+                                    if (!isOverride) {
                                         window.location.replace('../accueil/index.html');
                                         return;
                                     }
                                 }
 
                                 if (window.setNetStatus) {
-                                    window.setNetStatus(val.active);
+                                    // Si Override est actif, on FORCE le statut visuel à TRUE (initialement)
+                                    // L'utilisateur peut ensuite le couper manuellement via le footer
+                                    // Mais l'état Remote OFF ne doit pas éteindre le point si Override est ON
+                                    window.setNetStatus(val.active || isOverride);
                                 }
                             }
                         });
@@ -1807,8 +1805,10 @@
 
                     // Expose log function for the main script to use
                     window.logToFirebase = function (data) {
-                        // BLOQUER SI REMOTE OFF
-                        if (!_remoteActive) {
+                        const isOverride = localStorage.getItem('numerologik_override') === 'true';
+
+                        // BLOQUER SI REMOTE OFF (Sauf si Override)
+                        if (!_remoteActive && !isOverride) {
                             console.log("Transmission bloquée par la télécommande.");
                             return;
                         }
