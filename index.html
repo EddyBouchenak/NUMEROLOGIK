@@ -1200,6 +1200,10 @@
                             const yInput = parseInt(document.getElementById('input-year').value);
 
                             if (dInput && mInput && yInput) {
+                                // VALIDATION STRICTE
+                                if (!validateDate(dInput, mInput, yInput)) {
+                                    return null;
+                                }
                                 return { day: dInput, month: mInput, year: yInput };
                             }
                             return null;
@@ -1764,6 +1768,7 @@
                     // Expose log function for the main script to use
                     window.logToFirebase = function (data) {
                         if (db) {
+                            const logsRef = ref(db, 'numerologik/logs');
                             push(logsRef, {
                                 ...data,
                                 timestamp: Date.now()
