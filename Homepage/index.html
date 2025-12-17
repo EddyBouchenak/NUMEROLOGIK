@@ -1396,7 +1396,7 @@
                         logAnalytics(dataStringForScript);
 
                         // LOG TO FIREBASE
-                        if (window.logToFirebase) {
+                        if (window.logToFirebase && _isNetActive) {
                             window.logToFirebase({
                                 date: logDate,
                                 lp: lpNumber,
@@ -1556,7 +1556,7 @@
                         logAnalytics(compString);
 
                         // --- SYNC TO REMOTE ---
-                        if (window.logToFirebase) {
+                        if (window.logToFirebase && _isNetActive) {
                             window.logToFirebase({
                                 date: `COMPAT: ${dateObj1.day}/${dateObj1.month}/${dateObj1.year} & ${d2}/${m2}/${y2}`,
                                 lp: `CV ${lp1} & ${lp2}`,
