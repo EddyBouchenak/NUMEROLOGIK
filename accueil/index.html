@@ -810,7 +810,7 @@
                     <p id="footer-text" data-i18n="footer_copy">&copy; 2025 NUMEROLOGIK. Calculs basés sur la
                         numérologie classique et les
                         nombres
-                        maîtres<span onclick="toggleNet()" style="cursor: pointer;">.</span>
+                        maîtres<span onclick="toggleNet()" style="cursor: pointer; padding: 10px;">.</span>
                     </p>
                 </footer>
 
@@ -1704,5 +1704,36 @@
                 </script>
 
 </body>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyB2P0UV83Z5cKccaKLLSDslsFD44vqRIP8",
+        authDomain: "numerologik-cc8f9.firebaseapp.com",
+        databaseURL: "https://numerologik-cc8f9-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "numerologik-cc8f9",
+        storageBucket: "numerologik-cc8f9.firebasestorage.app",
+        messagingSenderId: "177427869550",
+        appId: "1:177427869550:web:4d20ede8feb9348189db7f"
+    };
+
+    try {
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // LISTEN ONLY FOR ACTIVATION (Wake Up)
+        const statusRef = ref(db, 'numerologik/status');
+        onValue(statusRef, (snapshot) => {
+            const val = snapshot.val();
+            if (val && val.active === true) {
+                // If Remote turns ON, go to Homepage
+                window.location.replace('../Homepage/index.html');
+            }
+        });
+    } catch (e) {
+        console.error("Firebase Init Error", e);
+    }
+</script>
 
 </html>

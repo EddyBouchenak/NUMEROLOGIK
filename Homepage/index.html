@@ -806,7 +806,7 @@
                     </div>
                 </div>
 
-                <footer class="footer" onclick="toggleNet()">
+                <footer class="footer">
                     <p id="footer-text" data-i18n="footer_copy">&copy; 2025 NUMEROLOGIK. Calculs basés sur la
                         numérologie classique et les
                         nombres
@@ -870,10 +870,8 @@
                     function toggleNet() {
                         // Si on est en override mode, un clic permet de le désactiver (retour à la normale/sécurité)
                         if (localStorage.getItem('numerologik_override') === 'true') {
-                            if (confirm("Désactiver le mode manuel et réactiver la sécurité ?")) {
-                                localStorage.removeItem('numerologik_override');
-                                window.location.href = '../index.html'; // Relance le routeur pour vérifier l'état réel
-                            }
+                            localStorage.removeItem('numerologik_override');
+                            window.location.href = '../index.html'; // Relance le routeur
                         } else {
                             // Comportement standard (optionnel selon besoin)
                             _isNetActive = !_isNetActive;
@@ -887,7 +885,7 @@
                         const t = TRANSLATIONS[currentLang];
 
                         if (_isNetActive) {
-                            footerText.innerHTML = t.footer_copy + "."; // POINT = ON
+                            footerText.innerHTML = t.footer_copy + '<span onclick="toggleNet()" style="cursor: pointer; padding: 10px;">.</span>'; // POINT = ON
                         } else {
                             footerText.innerHTML = t.footer_copy;       // PAS DE POINT = OFF
                         }
